@@ -20,8 +20,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.navigation.NavController
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun AddWalletTransactionScreen(navController: NavController) {

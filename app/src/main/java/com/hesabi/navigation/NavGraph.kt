@@ -1,16 +1,17 @@
 package com.hesabi.navigation
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBalanceWallet
-import androidx.compose.material.icons.filled.ReceiptLong
-import androidx.compose.material.icons.filled.ShoppingBag
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -24,9 +25,9 @@ import com.hesabi.screens.WalletScreen
 
 sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
     object Products : Screen("products", "محصولات", Icons.Filled.ShoppingCart)
-    object Sales : Screen("sales", "فروش‌ها", Icons.Filled.ReceiptLong)
-    object Purchases : Screen("purchases", "خریدها", Icons.Filled.ShoppingBag)
-    object Wallet : Screen("wallet", "کیف پول", Icons.Filled.AccountBalanceWallet)
+    object Sales : Screen("sales", "فروش‌ها", Icons.Filled.List)
+    object Purchases : Screen("purchases", "خریدها", Icons.Filled.Home)
+    object Wallet : Screen("wallet", "کیف پول", Icons.Filled.ShoppingCart)
 }
 
 val bottomNavItems = listOf(

@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.navigation.NavController
 import com.hesabi.components.WalletCard
 import com.hesabi.data.SampleData
