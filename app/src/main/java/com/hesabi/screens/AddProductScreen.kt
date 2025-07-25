@@ -5,12 +5,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CameraAlt
-import androidx.compose.material.icons.filled.QrCode
+import androidx.compose.material.icons.filled.Camera
+import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.Text
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
@@ -73,10 +74,10 @@ fun AddProductScreen(navController: NavController) {
             )
             Spacer(modifier = Modifier.width(8.dp))
             IconButton(onClick = { /* TODO: Generate barcode */ }) {
-                Icon(Icons.Filled.QrCode, contentDescription = "تولید بارکد")
+                Icon(Icons.Filled.QrCodeScanner, contentDescription = "تولید بارکد")
             }
             IconButton(onClick = { /* TODO: Scan barcode */ }) {
-                Icon(Icons.Filled.CameraAlt, contentDescription = "اسکن بارکد")
+                Icon(Icons.Filled.Camera, contentDescription = "اسکن بارکد")
             }
         }
         Spacer(modifier = Modifier.height(24.dp))

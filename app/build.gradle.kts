@@ -58,6 +58,9 @@ dependencies {
     implementation(libs.androidx.activity.compose)
 
     implementation(libs.bundles.compose.ui)
+    implementation(libs.androidx.compose.material.icons)
+
+    implementation(libs.androidx.navigation.compose)
 
     implementation(libs.accompanist.systemuicontroller)
 
