@@ -1,8 +1,14 @@
 package com.hesabi.navigation
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
+import androidx.compose.material.icons.filled.AccountBalanceWallet
+import androidx.compose.material.icons.filled.ReceiptLong
+import androidx.compose.material.icons.filled.ShoppingBag
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -11,7 +17,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.hesabi.screens.*
+import com.hesabi.screens.ProductsScreen
+import com.hesabi.screens.SalesScreen
+import com.hesabi.screens.PurchasesScreen
+import com.hesabi.screens.WalletScreen
 
 sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
     object Products : Screen("products", "محصولات", Icons.Filled.ShoppingCart)
