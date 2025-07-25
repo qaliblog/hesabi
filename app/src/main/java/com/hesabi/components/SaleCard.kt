@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -43,7 +43,7 @@ fun SaleCard(sale: Sale) {
                 Text(text = "جمع کل: ${sale.total} تومان", style = MaterialTheme.typography.bodyMedium)
             }
             IconButton(onClick = { /* TODO: Download receipt as PNG */ }) {
-                Icon(Icons.Filled.Download, contentDescription = "دانلود رسید")
+                Icon(Icons.Filled.FileDownload, contentDescription = "دانلود رسید")
             }
         }
     }

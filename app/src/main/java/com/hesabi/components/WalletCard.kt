@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.layout.height
 import com.hesabi.data.TransactionType
 import com.hesabi.data.WalletTransaction
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun WalletCard(transaction: WalletTransaction) {

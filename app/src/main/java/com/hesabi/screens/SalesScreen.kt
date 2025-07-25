@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.navigation.NavController
 import com.hesabi.components.SaleCard
 import com.hesabi.data.SampleData
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun SalesScreen(navController: NavController) {
