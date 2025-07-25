@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "vtsen.hashnode.dev.newemptycomposeapp"
+    namespace = "com.qali.hesabi"
     compileSdk = 34
 
     defaultConfig {
