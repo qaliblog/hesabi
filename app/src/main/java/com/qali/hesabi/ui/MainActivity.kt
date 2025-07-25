@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package vtsen.hashnode.dev.newemptycomposeapp.ui
+package com.qali.hesabi.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -24,8 +24,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import vtsen.hashnode.dev.newemptycomposeapp.ui.screens.MainScreen
-import vtsen.hashnode.dev.newemptycomposeapp.ui.theme.NewEmptyComposeAppTheme
+import com.qali.hesabi.ui.screens.MainScreen
+import com.qali.hesabi.ui.theme.NewEmptyComposeAppTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -9,7 +9,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "vtsen.hashnode.dev.newemptycomposeapp"
+        applicationId = "com.qali.hesabi"
         minSdk = 21
         targetSdk = 34
         versionCode = 1
