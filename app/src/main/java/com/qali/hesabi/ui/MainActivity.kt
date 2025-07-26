@@ -24,7 +24,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import com.qali.hesabi.ui.screens.MainScreen
+import com.hesabi.navigation.NavGraph
 import com.qali.hesabi.ui.theme.NewEmptyComposeAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -35,7 +35,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             NewEmptyComposeAppTheme {
-                MainScreen()
+                NavGraph()
             }
         }
     }
