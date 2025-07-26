@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.dp
 import com.qali.hesabi.data.Product
 import com.qali.hesabi.components.BarcodeView
+import com.qali.hesabi.util.PermissionRequester
 import android.content.ContentValues
 import android.graphics.Bitmap
 import android.os.Environment
@@ -39,12 +40,16 @@ import com.journeyapps.barcodescanner.BarcodeEncoder
 import kotlinx.coroutines.launch
 import java.io.OutputStream
 
+import androidx.compose.foundation.border
+
 @Composable
 fun ProductCard(product: Product) {
     Card(
         shape = RoundedCornerShape(20.dp),
-        elevation = CardDefaults.cardElevation(8.dp),
-        modifier = Modifier.fillMaxWidth()
+        elevation = CardDefaults.cardElevation(0.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(20.dp))
     ) {
         Column(
             modifier = Modifier
@@ -69,6 +74,7 @@ fun ProductCard(product: Product) {
 
                     BarcodeView(barcode = product.barcode)
                     IconButton(onClick = {
+                        PermissionRequester.request?.invoke()
                         coroutineScope.launch {
                             val barcodeEncoder = BarcodeEncoder()
                             val bitmap = barcodeEncoder.encodeBitmap(product.barcode, BarcodeFormat.CODE_128, 400, 150)

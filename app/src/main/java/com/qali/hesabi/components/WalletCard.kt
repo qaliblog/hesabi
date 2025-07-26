@@ -21,6 +21,8 @@ import com.qali.hesabi.data.TransactionType
 import com.qali.hesabi.data.WalletTransaction
 import androidx.compose.ui.unit.dp
 
+import androidx.compose.foundation.border
+
 @Composable
 fun WalletCard(transaction: WalletTransaction) {
     val color = when (transaction.type) {
@@ -30,8 +32,10 @@ fun WalletCard(transaction: WalletTransaction) {
     }
     Card(
         shape = RoundedCornerShape(20.dp),
-        elevation = CardDefaults.cardElevation(8.dp),
-        modifier = Modifier.fillMaxWidth()
+        elevation = CardDefaults.cardElevation(0.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(20.dp))
     ) {
         Row(
             modifier = Modifier

@@ -13,6 +13,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import com.qali.hesabi.navigation.NavGraph
 import com.qali.hesabi.ui.theme.HesabiTheme
+import com.qali.hesabi.util.RequestStoragePermission
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,6 +26,7 @@ class MainActivity : ComponentActivity() {
                         color = MaterialTheme.colorScheme.background
                     ) {
                         NavGraph()
+                        RequestStoragePermission(onGranted = { /* TODO */ }, onDenied = { /* TODO */ })
                     }
                 }
             }

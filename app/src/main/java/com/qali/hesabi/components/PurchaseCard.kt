@@ -22,12 +22,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.qali.hesabi.data.Purchase
 
+import androidx.compose.foundation.border
+
 @Composable
 fun PurchaseCard(purchase: Purchase) {
     Card(
         shape = RoundedCornerShape(20.dp),
-        elevation = CardDefaults.cardElevation(8.dp),
-        modifier = Modifier.fillMaxWidth()
+        elevation = CardDefaults.cardElevation(0.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(20.dp))
     ) {
         Row(
             modifier = Modifier
