@@ -1,20 +1,21 @@
 package com.qali.hesabi.components
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.dp
+import com.google.zxing.BarcodeFormat
+import com.journeyapps.barcodescanner.BarcodeEncoder
 
 @Composable
 fun BarcodeView(barcode: String) {
-    // Placeholder for barcode rendering. Replace with actual barcode generation logic.
-    Box(
-        modifier = Modifier
-            .size(width = 120.dp, height = 48.dp)
-            .background(Color.Gray, MaterialTheme.shapes.medium)
+    val barcodeEncoder = BarcodeEncoder()
+    val bitmap = barcodeEncoder.encodeBitmap(barcode, BarcodeFormat.CODE_128, 400, 150)
+    Image(
+        bitmap = bitmap.asImageBitmap(),
+        contentDescription = "Barcode",
+        modifier = Modifier.size(width = 120.dp, height = 48.dp)
     )
 }

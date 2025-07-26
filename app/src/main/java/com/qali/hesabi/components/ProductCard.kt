@@ -28,6 +28,16 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.dp
 import com.qali.hesabi.data.Product
 import com.qali.hesabi.components.BarcodeView
+import android.content.ContentValues
+import android.graphics.Bitmap
+import android.os.Environment
+import android.provider.MediaStore
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import com.google.zxing.BarcodeFormat
+import com.journeyapps.barcodescanner.BarcodeEncoder
+import kotlinx.coroutines.launch
+import java.io.OutputStream
 
 @Composable
 fun ProductCard(product: Product) {
@@ -54,12 +64,39 @@ fun ProductCard(product: Product) {
                 }
                 Spacer(modifier = Modifier.width(12.dp))
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    val context = LocalContext.current
+                    val coroutineScope = rememberCoroutineScope()
+
                     BarcodeView(barcode = product.barcode)
-                    IconButton(onClick = { /* TODO: Download barcode as PNG/JPG */ }) {
+                    IconButton(onClick = {
+                        coroutineScope.launch {
+                            val barcodeEncoder = BarcodeEncoder()
+                            val bitmap = barcodeEncoder.encodeBitmap(product.barcode, BarcodeFormat.CODE_128, 400, 150)
+                            saveBitmap(context, bitmap, "${product.name}-barcode.png")
+                        }
+                    }) {
                         Icon(Icons.Filled.ArrowDownward, contentDescription = "دانلود بارکد")
                     }
                 }
             }
+        }
+    }
+}
+
+private fun saveBitmap(context: android.content.Context, bitmap: Bitmap, fileName: String) {
+    val contentValues = ContentValues().apply {
+        put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+        put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
+        put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+    }
+
+    val resolver = context.contentResolver
+    val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+
+    uri?.let {
+        val outputStream: OutputStream? = resolver.openOutputStream(it)
+        outputStream?.use { stream ->
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
         }
     }
 }
