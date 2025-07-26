@@ -1,4 +1,4 @@
-package com.hesabi.data
+package com.qali.hesabi.data
 
 import android.content.Context
 import androidx.room.Database

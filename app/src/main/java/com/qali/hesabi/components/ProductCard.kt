@@ -1,4 +1,4 @@
-package com.hesabi.components
+package com.qali.hesabi.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -26,8 +26,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.dp
-import com.hesabi.data.Product
-import com.hesabi.components.BarcodeView
+import com.qali.hesabi.data.Product
+import com.qali.hesabi.components.BarcodeView
 
 @Composable
 fun ProductCard(product: Product) {

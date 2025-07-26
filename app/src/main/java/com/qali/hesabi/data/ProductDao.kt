@@ -1,4 +1,4 @@
-package com.hesabi.data
+package com.qali.hesabi.data
 
 import androidx.room.Dao
 import androidx.room.Insert

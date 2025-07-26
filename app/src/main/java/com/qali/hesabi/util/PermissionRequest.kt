@@ -1,4 +1,4 @@
-package com.hesabi.util
+package com.qali.hesabi.util
 
 import android.Manifest
 import android.os.Build

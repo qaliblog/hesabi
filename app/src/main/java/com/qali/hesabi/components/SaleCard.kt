@@ -1,4 +1,4 @@
-package com.hesabi.components
+package com.qali.hesabi.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -20,7 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.hesabi.data.Sale
+import com.qali.hesabi.data.Sale
 import androidx.compose.foundation.layout.height
 
 @Composable

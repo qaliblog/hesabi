@@ -1,4 +1,4 @@
-package com.hesabi.components
+package com.qali.hesabi.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

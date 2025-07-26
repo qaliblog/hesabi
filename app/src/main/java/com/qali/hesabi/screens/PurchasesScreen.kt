@@ -1,4 +1,4 @@
-package com.hesabi.screens
+package com.qali.hesabi.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,40 +15,33 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.navigation.NavController
-import com.hesabi.components.ProductCard
+import com.qali.hesabi.components.PurchaseCard
 import androidx.compose.ui.unit.dp
-import com.hesabi.navigation.Screen
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import com.hesabi.ui.ProductViewModel
-import androidx.compose.foundation.lazy.items
+import com.qali.hesabi.navigation.Screen
 
 @Composable
-fun ProductsScreen(navController: NavController, productViewModel: ProductViewModel) {
-    val products by productViewModel.allProducts.collectAsState(initial = emptyList())
+fun PurchasesScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
         Text(
-            text = "محصولات",
+            text = "خریدها",
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(bottom = 16.dp)
         )
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(products) { product ->
-                ProductCard(product = product)
-            }
+            // TODO: Display purchases from database
         }
         Spacer(modifier = Modifier.height(16.dp))
         Button(
-            onClick = { navController.navigate(Screen.AddProduct.route) },
+            onClick = { navController.navigate(Screen.AddPurchase.route) },
             modifier = Modifier.align(Alignment.End)
         ) {
-            Text("افزودن محصول جدید")
+            Text("افزودن خرید جدید")
         }
     }
 }

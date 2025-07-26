@@ -1,10 +1,10 @@
-package com.hesabi.ui
+package com.qali.hesabi.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.hesabi.data.Product
-import com.hesabi.data.ProductDao
+import com.qali.hesabi.data.Product
+import com.qali.hesabi.data.ProductDao
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 

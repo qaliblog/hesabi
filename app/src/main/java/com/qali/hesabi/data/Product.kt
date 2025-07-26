@@ -1,4 +1,4 @@
-package com.hesabi.data
+package com.qali.hesabi.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

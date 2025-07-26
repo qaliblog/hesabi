@@ -1,4 +1,4 @@
-package com.hesabi.screens
+package com.qali.hesabi.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

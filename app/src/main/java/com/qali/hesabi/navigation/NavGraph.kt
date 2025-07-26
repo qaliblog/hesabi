@@ -1,4 +1,4 @@
-package com.hesabi.navigation
+package com.qali.hesabi.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -21,17 +21,17 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.hesabi.HesabiApplication
-import com.hesabi.screens.ProductsScreen
-import com.hesabi.screens.SalesScreen
-import com.hesabi.screens.PurchasesScreen
-import com.hesabi.screens.WalletScreen
-import com.hesabi.screens.AddProductScreen
-import com.hesabi.screens.AddSaleScreen
-import com.hesabi.screens.AddPurchaseScreen
-import com.hesabi.screens.AddWalletTransactionScreen
-import com.hesabi.ui.ProductViewModel
-import com.hesabi.ui.ProductViewModelFactory
+import com.qali.hesabi.HesabiApplication
+import com.qali.hesabi.screens.ProductsScreen
+import com.qali.hesabi.screens.SalesScreen
+import com.qali.hesabi.screens.PurchasesScreen
+import com.qali.hesabi.screens.WalletScreen
+import com.qali.hesabi.screens.AddProductScreen
+import com.qali.hesabi.screens.AddSaleScreen
+import com.qali.hesabi.screens.AddPurchaseScreen
+import com.qali.hesabi.screens.AddWalletTransactionScreen
+import com.qali.hesabi.ui.ProductViewModel
+import com.qali.hesabi.ui.ProductViewModelFactory
 
 sealed class Screen(val route: String, val title: String, val icon: ImageVector? = null) {
     object Products : Screen("products", "محصولات", Icons.Filled.ShoppingCart)

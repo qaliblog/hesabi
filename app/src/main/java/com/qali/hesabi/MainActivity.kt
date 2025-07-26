@@ -1,4 +1,4 @@
-package com.hesabi
+package com.qali.hesabi
 
 import androidx.activity.ComponentActivity
 import android.os.Bundle
@@ -11,8 +11,8 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
-import com.hesabi.navigation.NavGraph
-import com.hesabi.ui.theme.HesabiTheme
+import com.qali.hesabi.navigation.NavGraph
+import com.qali.hesabi.ui.theme.HesabiTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -1,4 +1,4 @@
-package com.hesabi.screens
+package com.qali.hesabi.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,8 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.navigation.NavController
-import com.hesabi.components.WalletCard
-import com.hesabi.navigation.Screen
+import com.qali.hesabi.components.WalletCard
+import com.qali.hesabi.navigation.Screen
 
 @Composable
 fun WalletScreen(navController: NavController) {

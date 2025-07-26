@@ -1,4 +1,4 @@
-package com.hesabi.screens
+package com.qali.hesabi.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,9 +15,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.navigation.NavController
-import com.hesabi.components.SaleCard
+import com.qali.hesabi.components.SaleCard
 import androidx.compose.ui.unit.dp
-import com.hesabi.navigation.Screen
+import com.qali.hesabi.navigation.Screen
 
 @Composable
 fun SalesScreen(navController: NavController) {

@@ -1,4 +1,4 @@
-package com.hesabi.screens
+package com.qali.hesabi.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,8 +32,8 @@ import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.runtime.rememberCoroutineScope
-import com.hesabi.data.Product
-import com.hesabi.ui.ProductViewModel
+import com.qali.hesabi.data.Product
+import com.qali.hesabi.ui.ProductViewModel
 import kotlinx.coroutines.launch
 
 @Composable
