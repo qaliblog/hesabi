@@ -28,6 +28,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanOptions
+import androidx.activity.compose.rememberLauncherForActivityResult
 
 @Composable
 fun AddProductScreen(navController: NavController) {
@@ -35,6 +38,15 @@ fun AddProductScreen(navController: NavController) {
     var price by remember { mutableStateOf("") }
     var quantity by remember { mutableStateOf("") }
     var barcode by remember { mutableStateOf("") }
+
+    val scannerLauncher = rememberLauncherForActivityResult(
+        contract = ScanContract(),
+        onResult = { result ->
+            result.contents?.let {
+                barcode = it
+            }
+        }
+    )
 
     Column(
         modifier = Modifier
@@ -73,10 +85,21 @@ fun AddProductScreen(navController: NavController) {
                 modifier = Modifier.weight(1f)
             )
             Spacer(modifier = Modifier.width(8.dp))
-            IconButton(onClick = { /* TODO: Generate barcode */ }) {
+            IconButton(onClick = {
+                val randomBarcode = (0..9).shuffled().joinToString("").substring(0, 13)
+                barcode = randomBarcode
+            }) {
                 Icon(Icons.Filled.QrCodeScanner, contentDescription = "تولید بارکد")
             }
-            IconButton(onClick = { /* TODO: Scan barcode */ }) {
+            IconButton(onClick = {
+                val options = ScanOptions()
+                options.setDesiredBarcodeFormats(ScanOptions.ALL_CODE_TYPES)
+                options.setPrompt("Scan a barcode")
+                options.setCameraId(0)
+                options.setBeepEnabled(false)
+                options.setBarcodeImageEnabled(true)
+                scannerLauncher.launch(options)
+            }) {
                 Icon(Icons.Filled.Camera, contentDescription = "اسکن بارکد")
             }
         }
