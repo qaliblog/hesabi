@@ -1,4 +1,4 @@
-package com.hesabi.ui.theme
+package com.qali.hesabi.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
