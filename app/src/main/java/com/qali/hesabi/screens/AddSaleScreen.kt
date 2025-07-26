@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Text
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
@@ -42,23 +43,31 @@ import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
 import androidx.activity.compose.rememberLauncherForActivityResult
 import com.qali.hesabi.data.Product
+import com.qali.hesabi.data.Sale
+import com.qali.hesabi.data.SaleItem
 import com.qali.hesabi.ui.ProductViewModel
+import com.qali.hesabi.ui.SaleViewModel
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddSaleScreen(navController: NavController, productViewModel: ProductViewModel) {
+fun AddSaleScreen(navController: NavController, productViewModel: ProductViewModel, saleViewModel: SaleViewModel) {
     var buyerName by remember { mutableStateOf("") }
-    var selectedProduct by remember { mutableStateOf<Product?>(null) }
-    var quantity by remember { mutableStateOf("") }
-    var price by remember { mutableStateOf("") }
+    var selectedProducts by remember { mutableStateOf<List<SaleItem>>(emptyList()) }
     var showProductDialog by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
+    var currentQuantity by remember { mutableStateOf("1") }
+    var currentPrice by remember { mutableStateOf("") }
     
     val products by productViewModel.allProducts.collectAsState(initial = emptyList())
     val filteredProducts = products.filter { 
         it.name.contains(searchQuery, ignoreCase = true) || 
         it.barcode.contains(searchQuery, ignoreCase = true)
     }
+    
+    val coroutineScope = rememberCoroutineScope()
+    val total = selectedProducts.sumOf { it.price * it.quantity }
 
     val scannerLauncher = rememberLauncherForActivityResult(
         contract = ScanContract(),
@@ -66,8 +75,14 @@ fun AddSaleScreen(navController: NavController, productViewModel: ProductViewMod
             result.contents?.let { barcode ->
                 val foundProduct = products.find { it.barcode == barcode }
                 if (foundProduct != null) {
-                    selectedProduct = foundProduct
-                    price = foundProduct.price.toString()
+                    val newItem = SaleItem(
+                        productId = foundProduct.id,
+                        productName = foundProduct.name,
+                        quantity = 1,
+                        price = foundProduct.price,
+                        barcode = foundProduct.barcode
+                    )
+                    selectedProducts = selectedProducts + newItem
                 }
             }
         }
@@ -81,6 +96,7 @@ fun AddSaleScreen(navController: NavController, productViewModel: ProductViewMod
     ) {
         Text(text = "افزودن فروش جدید", style = MaterialTheme.typography.headlineSmall)
         Spacer(modifier = Modifier.height(24.dp))
+        
         OutlinedTextField(
             value = buyerName,
             onValueChange = { buyerName = it },
@@ -92,9 +108,9 @@ fun AddSaleScreen(navController: NavController, productViewModel: ProductViewMod
         // Product selection row
         Row(verticalAlignment = Alignment.CenterVertically) {
             OutlinedTextField(
-                value = selectedProduct?.name ?: "",
+                value = "",
                 onValueChange = {},
-                label = { Text("محصول") },
+                label = { Text("انتخاب محصول") },
                 readOnly = true,
                 modifier = Modifier.weight(1f)
             )
@@ -117,27 +133,80 @@ fun AddSaleScreen(navController: NavController, productViewModel: ProductViewMod
             }
         }
         
-        Spacer(modifier = Modifier.height(12.dp))
-        OutlinedTextField(
-            value = quantity,
-            onValueChange = { quantity = it.filter { c -> c.isDigit() } },
-            label = { Text("تعداد") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-        OutlinedTextField(
-            value = price,
-            onValueChange = { price = it.filter { c -> c.isDigit() || c == '.' } },
-            label = { Text("قیمت (تومان)") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.dp))
+        
+        // Selected products list
+        if (selectedProducts.isNotEmpty()) {
+            Text(
+                text = "محصولات انتخاب شده:",
+                style = MaterialTheme.typography.titleMedium
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            LazyColumn(
+                modifier = Modifier.height(200.dp)
+            ) {
+                items(selectedProducts) { item ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surface
+                        )
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(12.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = item.productName,
+                                    style = MaterialTheme.typography.titleSmall
+                                )
+                                Text(
+                                    text = "تعداد: ${item.quantity} - قیمت: ${item.price} تومان",
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
+                            IconButton(
+                                onClick = {
+                                    selectedProducts = selectedProducts.filter { it != item }
+                                }
+                            ) {
+                                Icon(Icons.Filled.Delete, contentDescription = "حذف")
+                            }
+                        }
+                    }
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "جمع کل: $total تومان",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+        
         Button(
             onClick = {
-                // TODO: Save sale to database
-                navController.popBackStack()
+                if (buyerName.isNotEmpty() && selectedProducts.isNotEmpty()) {
+                    coroutineScope.launch {
+                        val sale = Sale(
+                            buyerName = buyerName,
+                            total = total,
+                            products = selectedProducts
+                        )
+                        saleViewModel.insert(sale)
+                        navController.popBackStack()
+                    }
+                }
             },
-            modifier = Modifier.align(Alignment.End)
+            modifier = Modifier.align(Alignment.End),
+            enabled = buyerName.isNotEmpty() && selectedProducts.isNotEmpty()
         ) {
             Text("ذخیره فروش")
         }
@@ -169,8 +238,14 @@ fun AddSaleScreen(navController: NavController, productViewModel: ProductViewMod
                                     .fillMaxWidth()
                                     .padding(vertical = 4.dp),
                                 onClick = {
-                                    selectedProduct = product
-                                    price = product.price.toString()
+                                    val newItem = SaleItem(
+                                        productId = product.id,
+                                        productName = product.name,
+                                        quantity = 1,
+                                        price = product.price,
+                                        barcode = product.barcode
+                                    )
+                                    selectedProducts = selectedProducts + newItem
                                     showProductDialog = false
                                 },
                                 colors = CardDefaults.cardColors(

@@ -32,6 +32,8 @@ import com.qali.hesabi.screens.AddPurchaseScreen
 import com.qali.hesabi.screens.AddWalletTransactionScreen
 import com.qali.hesabi.ui.ProductViewModel
 import com.qali.hesabi.ui.ProductViewModelFactory
+import com.qali.hesabi.ui.SaleViewModel
+import com.qali.hesabi.ui.SaleViewModelFactory
 
 sealed class Screen(val route: String, val title: String, val icon: ImageVector? = null) {
     object Products : Screen("products", "محصولات", Icons.Filled.ShoppingCart)
@@ -58,6 +60,10 @@ fun NavGraph() {
     val productViewModel: ProductViewModel = viewModel(
         factory = ProductViewModelFactory((context.applicationContext as HesabiApplication).database.productDao())
     )
+    val saleViewModel: SaleViewModel = viewModel(
+        factory = SaleViewModelFactory((context.applicationContext as HesabiApplication).database.saleDao())
+    )
+    
     Scaffold(
         bottomBar = {
             NavigationBar {
@@ -80,11 +86,11 @@ fun NavGraph() {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Products.route) { ProductsScreen(navController, productViewModel) }
-            composable(Screen.Sales.route) { SalesScreen(navController) }
+            composable(Screen.Sales.route) { SalesScreen(navController, saleViewModel) }
             composable(Screen.Purchases.route) { PurchasesScreen(navController) }
             composable(Screen.Wallet.route) { WalletScreen(navController) }
             composable(Screen.AddProduct.route) { AddProductScreen(navController, productViewModel) }
-            composable(Screen.AddSale.route) { AddSaleScreen(navController, productViewModel) }
+            composable(Screen.AddSale.route) { AddSaleScreen(navController, productViewModel, saleViewModel) }
             composable(Screen.AddPurchase.route) { AddPurchaseScreen(navController, productViewModel) }
             composable(Screen.AddWalletTransaction.route) { AddWalletTransactionScreen(navController) }
         }
