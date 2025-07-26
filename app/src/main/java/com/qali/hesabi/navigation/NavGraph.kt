@@ -87,7 +87,7 @@ fun NavGraph() {
     
     Scaffold(
         topBar = {
-            androidx.compose.material3.TopAppBar(
+            androidx.compose.material3.SmallTopAppBar(
                 title = {
                     Text(
                         text = "حسابی",
