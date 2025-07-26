@@ -168,38 +168,42 @@ fun generateReceiptBitmapStyled(sale: Sale, dateString: String): Bitmap {
     val height = 300 + sale.products.size * 60
     val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
     val canvas = Canvas(bitmap)
-    // Gradient background
-    val paintBg = Paint()
-    paintBg.shader = android.graphics.LinearGradient(
-        0f, 0f, 0f, height.toFloat(),
-        AndroidColor.parseColor("#FAFAFA"),
-        AndroidColor.parseColor("#E0E0E0"),
-        android.graphics.Shader.TileMode.CLAMP
-    )
-    canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paintBg)
+    // Set background to white
+    val backgroundPaint = Paint().apply {
+        color = AndroidColor.WHITE
+        style = Paint.Style.FILL
+    }
+    canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), backgroundPaint)
+    // Draw black border
+    val borderPaint = Paint().apply {
+        color = AndroidColor.BLACK
+        style = Paint.Style.STROKE
+        strokeWidth = 8f
+    }
+    canvas.drawRect(8f, 8f, width - 8f, height - 8f, borderPaint)
     // Title
     val titlePaint = Paint().apply {
-        color = AndroidColor.parseColor("#1976D2")
+        color = AndroidColor.BLACK
         textSize = 44f
         isFakeBoldText = true
         textAlign = Paint.Align.RIGHT
         isAntiAlias = true
     }
     val itemPaint = Paint().apply {
-        color = AndroidColor.parseColor("#333333")
+        color = AndroidColor.DKGRAY
         textSize = 32f
         textAlign = Paint.Align.RIGHT
         isAntiAlias = true
     }
     val totalPaint = Paint().apply {
-        color = AndroidColor.parseColor("#D32F2F")
+        color = AndroidColor.BLACK
         textSize = 36f
         isFakeBoldText = true
         textAlign = Paint.Align.RIGHT
         isAntiAlias = true
     }
     val labelPaint = Paint().apply {
-        color = AndroidColor.parseColor("#1976D2")
+        color = AndroidColor.DKGRAY
         textSize = 32f
         isFakeBoldText = true
         textAlign = Paint.Align.RIGHT

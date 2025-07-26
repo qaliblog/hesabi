@@ -26,40 +26,37 @@ object ReceiptUtils {
                 val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
                 val canvas = Canvas(bitmap)
 
-                // Set background
+                // Set background to white
                 val backgroundPaint = Paint().apply {
-                    color = android.graphics.Color.parseColor("#FAFAFA")
+                    color = android.graphics.Color.WHITE
                     style = Paint.Style.FILL
                 }
                 canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), backgroundPaint)
 
-                // Create gradient background effect
-                val gradientPaint = Paint().apply {
-                    shader = android.graphics.LinearGradient(
-                        0f, 0f, 0f, height.toFloat(),
-                        android.graphics.Color.parseColor("#FAFAFA"),
-                        android.graphics.Color.parseColor("#E0E0E0"),
-                        android.graphics.Shader.TileMode.CLAMP
-                    )
+                // Draw black border
+                val borderPaint = Paint().apply {
+                    color = android.graphics.Color.BLACK
+                    style = Paint.Style.STROKE
+                    strokeWidth = 8f
                 }
-                canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), gradientPaint)
+                canvas.drawRect(8f, 8f, width - 8f, height - 8f, borderPaint)
 
-                // Set up text paint
+                // Set up text paint (black only)
                 val titlePaint = Paint().apply {
-                    color = android.graphics.Color.parseColor("#1976D2")
+                    color = android.graphics.Color.BLACK
                     textSize = 44f
                     isFakeBoldText = true
                     textAlign = Paint.Align.RIGHT
                 }
 
                 val itemPaint = Paint().apply {
-                    color = android.graphics.Color.parseColor("#333333")
+                    color = android.graphics.Color.DKGRAY
                     textSize = 32f
                     textAlign = Paint.Align.RIGHT
                 }
 
                 val totalPaint = Paint().apply {
-                    color = android.graphics.Color.parseColor("#D32F2F")
+                    color = android.graphics.Color.BLACK
                     textSize = 36f
                     isFakeBoldText = true
                     textAlign = Paint.Align.RIGHT
