@@ -26,11 +26,26 @@ import androidx.compose.foundation.border
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import android.content.ContentValues
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color as AndroidColor
+import android.graphics.Paint
+import android.os.Environment
+import android.provider.MediaStore
+import android.util.Log
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import androidx.compose.runtime.rememberCoroutineScope
 
 @Composable
 fun SaleCard(sale: Sale) {
     val dateFormat = SimpleDateFormat("yyyy/MM/dd HH:mm", Locale("fa"))
     val dateString = dateFormat.format(Date(sale.date))
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
     
     Card(
         shape = RoundedCornerShape(20.dp),
@@ -55,7 +70,13 @@ fun SaleCard(sale: Sale) {
                     Text(text = "تاریخ: $dateString", style = MaterialTheme.typography.bodySmall)
                     Text(text = "جمع کل: ${sale.total} تومان", style = MaterialTheme.typography.bodyMedium)
                 }
-                IconButton(onClick = { /* TODO: Download receipt as PNG */ }) {
+                IconButton(onClick = {
+                    coroutineScope.launch {
+                        val bitmap = generateReceiptBitmap(sale, dateString)
+                        val success = saveBitmap(context, bitmap, "sale-receipt-${sale.id}.png")
+                        Toast.makeText(context, if (success) "رسید ذخیره شد" else "خطا در ذخیره رسید", Toast.LENGTH_SHORT).show()
+                    }
+                }) {
                     Icon(Icons.Filled.ArrowDownward, contentDescription = "دانلود رسید")
                 }
             }
@@ -87,5 +108,56 @@ fun SaleCard(sale: Sale) {
                 }
             }
         }
+    }
+}
+
+fun generateReceiptBitmap(sale: Sale, dateString: String): Bitmap {
+    val width = 600
+    val height = 300 + sale.products.size * 60
+    val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+    val canvas = Canvas(bitmap)
+    val paint = Paint().apply {
+        color = AndroidColor.BLACK
+        textSize = 32f
+        isAntiAlias = true
+    }
+    canvas.drawColor(AndroidColor.WHITE)
+    var y = 50
+    canvas.drawText("رسید فروش", 220f, y.toFloat(), paint)
+    y += 50
+    canvas.drawText("خریدار: ${sale.buyerName}", 30f, y.toFloat(), paint)
+    y += 40
+    canvas.drawText("تاریخ: $dateString", 30f, y.toFloat(), paint)
+    y += 40
+    canvas.drawText("محصولات:", 30f, y.toFloat(), paint)
+    y += 40
+    sale.products.forEach {
+        canvas.drawText("${it.productName} (${it.quantity} عدد) - ${it.price * it.quantity} تومان", 30f, y.toFloat(), paint)
+        y += 40
+    }
+    y += 20
+    paint.textSize = 36f
+    canvas.drawText("جمع کل: ${sale.total} تومان", 30f, y.toFloat(), paint)
+    return bitmap
+}
+
+fun saveBitmap(context: android.content.Context, bitmap: Bitmap, fileName: String): Boolean {
+    return try {
+        val contentValues = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+            put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
+            put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
+        }
+        val resolver = context.contentResolver
+        val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+        if (uri == null) return false
+        val outputStream = resolver.openOutputStream(uri) ?: return false
+        outputStream.use { stream ->
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+        }
+        true
+    } catch (e: Exception) {
+        Log.e("SaleCard", "Error saving bitmap", e)
+        false
     }
 }

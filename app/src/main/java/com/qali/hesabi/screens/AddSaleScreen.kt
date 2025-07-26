@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Text
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
@@ -165,8 +166,39 @@ fun AddSaleScreen(navController: NavController, productViewModel: ProductViewMod
                                     text = item.productName,
                                     style = MaterialTheme.typography.titleSmall
                                 )
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    IconButton(onClick = {
+                                        if (item.quantity > 1) {
+                                            selectedProducts = selectedProducts.map {
+                                                if (it == item) it.copy(quantity = it.quantity - 1) else it
+                                            }
+                                        }
+                                    }) {
+                                        Icon(Icons.Filled.Remove, contentDescription = "کاهش تعداد")
+                                    }
+                                    OutlinedTextField(
+                                        value = item.quantity.toString(),
+                                        onValueChange = { newValue ->
+                                            val newQty = newValue.toIntOrNull() ?: 1
+                                            if (newQty > 0) {
+                                                selectedProducts = selectedProducts.map {
+                                                    if (it == item) it.copy(quantity = newQty) else it
+                                                }
+                                            }
+                                        },
+                                        label = { Text("تعداد") },
+                                        modifier = Modifier.width(60.dp)
+                                    )
+                                    IconButton(onClick = {
+                                        selectedProducts = selectedProducts.map {
+                                            if (it == item) it.copy(quantity = it.quantity + 1) else it
+                                        }
+                                    }) {
+                                        Icon(Icons.Filled.Add, contentDescription = "افزایش تعداد")
+                                    }
+                                }
                                 Text(
-                                    text = "تعداد: ${item.quantity} - قیمت: ${item.price} تومان",
+                                    text = "قیمت: ${item.price} تومان",
                                     style = MaterialTheme.typography.bodySmall
                                 )
                             }

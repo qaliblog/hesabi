@@ -34,6 +34,10 @@ import com.qali.hesabi.ui.ProductViewModel
 import com.qali.hesabi.ui.ProductViewModelFactory
 import com.qali.hesabi.ui.SaleViewModel
 import com.qali.hesabi.ui.SaleViewModelFactory
+import com.qali.hesabi.ui.PurchaseViewModel
+import com.qali.hesabi.ui.PurchaseViewModelFactory
+import com.qali.hesabi.ui.WalletTransactionViewModel
+import com.qali.hesabi.ui.WalletTransactionViewModelFactory
 
 sealed class Screen(val route: String, val title: String, val icon: ImageVector? = null) {
     object Products : Screen("products", "محصولات", Icons.Filled.ShoppingCart)
@@ -63,6 +67,12 @@ fun NavGraph() {
     val saleViewModel: SaleViewModel = viewModel(
         factory = SaleViewModelFactory((context.applicationContext as HesabiApplication).database.saleDao())
     )
+    val purchaseViewModel: PurchaseViewModel = viewModel(
+        factory = PurchaseViewModelFactory((context.applicationContext as HesabiApplication).database.purchaseDao())
+    )
+    val walletTransactionViewModel: WalletTransactionViewModel = viewModel(
+        factory = WalletTransactionViewModelFactory((context.applicationContext as HesabiApplication).database.walletTransactionDao())
+    )
     
     Scaffold(
         bottomBar = {
@@ -87,8 +97,8 @@ fun NavGraph() {
         ) {
             composable(Screen.Products.route) { ProductsScreen(navController, productViewModel) }
             composable(Screen.Sales.route) { SalesScreen(navController, saleViewModel) }
-            composable(Screen.Purchases.route) { PurchasesScreen(navController) }
-            composable(Screen.Wallet.route) { WalletScreen(navController) }
+            composable(Screen.Purchases.route) { PurchasesScreen(navController, purchaseViewModel) }
+            composable(Screen.Wallet.route) { WalletScreen(navController, walletTransactionViewModel) }
             composable(Screen.AddProduct.route) { AddProductScreen(navController, productViewModel) }
             composable(Screen.AddSale.route) { AddSaleScreen(navController, productViewModel, saleViewModel) }
             composable(Screen.AddPurchase.route) { AddPurchaseScreen(navController, productViewModel) }

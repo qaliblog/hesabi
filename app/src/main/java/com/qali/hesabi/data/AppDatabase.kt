@@ -7,12 +7,18 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.qali.hesabi.data.converters.ListConverter
 
-@Database(entities = [Product::class, Sale::class], version = 1, exportSchema = false)
+@Database(
+    entities = [Product::class, Sale::class, Purchase::class, WalletTransaction::class],
+    version = 1,
+    exportSchema = false
+)
 @TypeConverters(ListConverter::class)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun productDao(): ProductDao
     abstract fun saleDao(): SaleDao
+    abstract fun purchaseDao(): PurchaseDao
+    abstract fun walletTransactionDao(): WalletTransactionDao
 
     companion object {
         @Volatile
