@@ -26,6 +26,7 @@ fun WalletCard(transaction: WalletTransaction) {
     val color = when (transaction.type) {
         TransactionType.INCOME -> Color(0xFF43A047)
         TransactionType.EXPENSE -> Color(0xFFD32F2F)
+        else -> Color.Gray
     }
     Card(
         shape = RoundedCornerShape(20.dp),
