@@ -87,19 +87,19 @@ fun NavGraph() {
     
     Scaffold(
         topBar = {
-            androidx.compose.material3.SmallTopAppBar(
-                title = {
-                    Text(
-                        text = "حسابی",
-                        style = MaterialTheme.typography.displayLarge,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentWidth(Alignment.End),
-                        textAlign = TextAlign.Right
-                    )
-                }
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp, end = 24.dp, start = 24.dp),
+                horizontalArrangement = Arrangement.End
+            ) {
+                Text(
+                    text = "حسابی",
+                    style = MaterialTheme.typography.displayLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    textAlign = TextAlign.Right
+                )
+            }
         },
         bottomBar = {
             NavigationBar {
