@@ -9,7 +9,7 @@ import com.qali.hesabi.data.converters.ListConverter
 
 @Database(
     entities = [Product::class, Sale::class, Purchase::class, WalletTransaction::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(ListConverter::class)
@@ -30,7 +30,7 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "hesabi_database"
-                ).build()
+                ).fallbackToDestructiveMigration().build()
                 instance = instanceResult
                 instanceResult
             }
