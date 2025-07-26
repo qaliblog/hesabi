@@ -22,22 +22,41 @@ import com.qali.hesabi.components.SaleCard
 import androidx.compose.ui.unit.dp
 import com.qali.hesabi.navigation.Screen
 import com.qali.hesabi.ui.SaleViewModel
+import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.material3.CardDefaults
 
 @Composable
 fun SalesScreen(navController: NavController, saleViewModel: SaleViewModel) {
     val sales by saleViewModel.allSales.collectAsState(initial = emptyList())
-    
+    val gradient = Brush.verticalGradient(
+        colors = listOf(
+            MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+            MaterialTheme.colorScheme.background
+        )
+    )
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .background(gradient)
+            .padding(24.dp)
     ) {
-        Text(
-            text = "فروش‌ها",
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-        
+        androidx.compose.material3.Card(
+            shape = MaterialTheme.shapes.large,
+            elevation = CardDefaults.cardElevation(4.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 20.dp)
+        ) {
+            Text(
+                text = "فروشها",
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                modifier = Modifier.padding(20.dp)
+            )
+        }
         if (sales.isEmpty()) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -52,20 +71,29 @@ fun SalesScreen(navController: NavController, saleViewModel: SaleViewModel) {
             }
         } else {
             LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.weight(1f)
             ) {
                 items(sales) { sale ->
                     SaleCard(sale = sale)
                 }
             }
         }
-        
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
         Button(
             onClick = { navController.navigate(Screen.AddSale.route) },
-            modifier = Modifier.align(Alignment.End)
+            modifier = Modifier
+                .align(Alignment.End)
+                .height(56.dp)
+                .requiredWidth(220.dp),
+            shape = MaterialTheme.shapes.medium,
+            colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ),
+            elevation = androidx.compose.material3.ButtonDefaults.buttonElevation(8.dp)
         ) {
-            Text("افزودن فروش جدید")
+            Text("افزودن فروش جدید", style = MaterialTheme.typography.titleLarge)
         }
     }
 }

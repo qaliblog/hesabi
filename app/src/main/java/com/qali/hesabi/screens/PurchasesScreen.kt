@@ -22,20 +22,42 @@ import com.qali.hesabi.components.PurchaseCard
 import androidx.compose.ui.unit.dp
 import com.qali.hesabi.navigation.Screen
 import com.qali.hesabi.ui.PurchaseViewModel
+import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.material3.CardDefaults
+import androidx.compose.foundation.layout.requiredWidth
 
 @Composable
 fun PurchasesScreen(navController: NavController, purchaseViewModel: PurchaseViewModel) {
     val purchases by purchaseViewModel.allPurchases.collectAsState(initial = emptyList())
+    val gradient = Brush.verticalGradient(
+        colors = listOf(
+            MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+            MaterialTheme.colorScheme.background
+        )
+    )
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .background(gradient)
+            .padding(24.dp)
     ) {
-        Text(
-            text = "رسیدهای خرید",
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
+        androidx.compose.material3.Card(
+            shape = MaterialTheme.shapes.large,
+            elevation = CardDefaults.cardElevation(4.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 20.dp)
+        ) {
+            Text(
+                text = "رسیدهای خرید",
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                modifier = Modifier.padding(20.dp)
+            )
+        }
         if (purchases.isEmpty()) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -50,19 +72,29 @@ fun PurchasesScreen(navController: NavController, purchaseViewModel: PurchaseVie
             }
         } else {
             LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.weight(1f)
             ) {
                 items(purchases) { purchase ->
                     PurchaseCard(purchase = purchase)
                 }
             }
         }
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
         Button(
             onClick = { navController.navigate(Screen.AddPurchase.route) },
-            modifier = Modifier.align(Alignment.End)
+            modifier = Modifier
+                .align(Alignment.End)
+                .height(56.dp)
+                .requiredWidth(220.dp),
+            shape = MaterialTheme.shapes.medium,
+            colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ),
+            elevation = androidx.compose.material3.ButtonDefaults.buttonElevation(8.dp)
         ) {
-            Text("افزودن خرید جدید")
+            Text("افزودن خرید جدید", style = MaterialTheme.typography.titleLarge)
         }
     }
 }

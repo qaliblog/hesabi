@@ -38,6 +38,11 @@ import com.qali.hesabi.ui.PurchaseViewModel
 import com.qali.hesabi.ui.PurchaseViewModelFactory
 import com.qali.hesabi.ui.WalletTransactionViewModel
 import com.qali.hesabi.ui.WalletTransactionViewModelFactory
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.unit.dp
 
 sealed class Screen(val route: String, val title: String, val icon: ImageVector? = null) {
     object Products : Screen("products", "محصولات", Icons.Filled.ShoppingCart)
@@ -90,6 +95,18 @@ fun NavGraph() {
             }
         }
     ) { innerPadding ->
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp, end = 24.dp, start = 24.dp),
+            horizontalArrangement = Arrangement.End
+        ) {
+            Text(
+                text = "حسابی",
+                style = MaterialTheme.typography.displayLarge,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
         NavHost(
             navController = navController,
             startDestination = Screen.Products.route,
