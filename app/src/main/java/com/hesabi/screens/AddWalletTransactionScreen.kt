@@ -67,7 +67,10 @@ fun AddWalletTransactionScreen(navController: NavController) {
         )
         Spacer(modifier = Modifier.height(24.dp))
         Button(
-            onClick = { /* TODO: Save transaction */ },
+            onClick = {
+                // TODO: Save transaction to database
+                navController.popBackStack()
+            },
             modifier = Modifier.align(Alignment.End)
         ) {
             Text("ذخیره تراکنش")

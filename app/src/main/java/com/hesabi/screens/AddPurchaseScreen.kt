@@ -81,7 +81,10 @@ fun AddPurchaseScreen(navController: NavController) {
         )
         Spacer(modifier = Modifier.height(24.dp))
         Button(
-            onClick = { /* TODO: Save purchase */ },
+            onClick = {
+                // TODO: Save purchase to database
+                navController.popBackStack()
+            },
             modifier = Modifier.align(Alignment.End)
         ) {
             Text("ذخیره خرید")

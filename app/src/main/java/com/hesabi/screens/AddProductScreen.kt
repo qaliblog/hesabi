@@ -82,7 +82,10 @@ fun AddProductScreen(navController: NavController) {
         }
         Spacer(modifier = Modifier.height(24.dp))
         Button(
-            onClick = { /* TODO: Save product */ },
+            onClick = {
+                // TODO: Save product to database
+                navController.popBackStack()
+            },
             modifier = Modifier.align(Alignment.End)
         ) {
             Text("ذخیره محصول")
