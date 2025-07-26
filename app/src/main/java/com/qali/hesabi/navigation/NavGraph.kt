@@ -99,9 +99,7 @@ fun NavGraph() {
                         textAlign = TextAlign.Right
                     )
                 },
-                colors = androidx.compose.material3.TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
+                backgroundColor = MaterialTheme.colorScheme.background
             )
         },
         bottomBar = {
