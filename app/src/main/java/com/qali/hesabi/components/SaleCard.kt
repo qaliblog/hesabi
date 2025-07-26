@@ -39,6 +39,9 @@ import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.rememberCoroutineScope
+import android.os.Build
+import android.content.Intent
+import android.net.Uri
 
 @Composable
 fun SaleCard(sale: Sale) {
@@ -143,17 +146,33 @@ fun generateReceiptBitmap(sale: Sale, dateString: String): Bitmap {
 
 fun saveSaleReceiptBitmap(context: android.content.Context, bitmap: Bitmap, fileName: String): Boolean {
     return try {
+        val resolver = context.contentResolver
+        val imageCollection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+        } else {
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        }
         val contentValues = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
             put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
-            put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                put(MediaStore.MediaColumns.RELATIVE_PATH, "Pictures/HesabiReceipts")
+            } else {
+                val pictures = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).absolutePath
+                put(MediaStore.MediaColumns.DATA, "$pictures/HesabiReceipts/$fileName")
+            }
         }
-        val resolver = context.contentResolver
-        val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
-        if (uri == null) return false
+        val uri = resolver.insert(imageCollection, contentValues) ?: return false
         val outputStream = resolver.openOutputStream(uri) ?: return false
         outputStream.use { stream ->
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+            stream.flush()
+        }
+        // For Android 9 and below, trigger media scan
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            val scanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+            scanIntent.data = uri
+            context.sendBroadcast(scanIntent)
         }
         true
     } catch (e: Exception) {

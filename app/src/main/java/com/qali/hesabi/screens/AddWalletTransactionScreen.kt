@@ -23,12 +23,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.navigation.NavController
 import androidx.compose.ui.unit.dp
+import com.qali.hesabi.data.WalletTransaction
+import com.qali.hesabi.data.TransactionType
+import com.qali.hesabi.ui.WalletTransactionViewModel
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
-fun AddWalletTransactionScreen(navController: NavController) {
+fun AddWalletTransactionScreen(navController: NavController, walletTransactionViewModel: WalletTransactionViewModel) {
     var amount by remember { mutableStateOf("") }
     var type by remember { mutableStateOf(0) } // 0: INCOME, 1: EXPENSE
     var description by remember { mutableStateOf("") }
+
+    val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -68,8 +75,19 @@ fun AddWalletTransactionScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(24.dp))
         Button(
             onClick = {
-                // TODO: Save transaction to database
-                navController.popBackStack()
+                val amt = amount.toDoubleOrNull() ?: 0.0
+                if (amt > 0.0 && description.isNotBlank()) {
+                    coroutineScope.launch {
+                        walletTransactionViewModel.insert(
+                            WalletTransaction(
+                                amount = amt,
+                                type = if (type == 0) TransactionType.INCOME else TransactionType.EXPENSE,
+                                description = description
+                            )
+                        )
+                        navController.popBackStack()
+                    }
+                }
             },
             modifier = Modifier.align(Alignment.End)
         ) {

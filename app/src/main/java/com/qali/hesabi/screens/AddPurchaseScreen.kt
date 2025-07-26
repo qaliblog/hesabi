@@ -43,10 +43,14 @@ import com.journeyapps.barcodescanner.ScanOptions
 import androidx.activity.compose.rememberLauncherForActivityResult
 import com.qali.hesabi.data.Product
 import com.qali.hesabi.ui.ProductViewModel
+import com.qali.hesabi.data.Purchase
+import com.qali.hesabi.ui.PurchaseViewModel
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddPurchaseScreen(navController: NavController, productViewModel: ProductViewModel) {
+fun AddPurchaseScreen(navController: NavController, productViewModel: ProductViewModel, purchaseViewModel: PurchaseViewModel) {
     var selectedProduct by remember { mutableStateOf<Product?>(null) }
     var quantity by remember { mutableStateOf("") }
     var price by remember { mutableStateOf("") }
@@ -71,6 +75,8 @@ fun AddPurchaseScreen(navController: NavController, productViewModel: ProductVie
             }
         }
     )
+
+    val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -126,8 +132,14 @@ fun AddPurchaseScreen(navController: NavController, productViewModel: ProductVie
         Spacer(modifier = Modifier.height(24.dp))
         Button(
             onClick = {
-                // TODO: Save purchase to database
-                navController.popBackStack()
+                val qty = quantity.toIntOrNull() ?: 0
+                val prc = price.toDoubleOrNull() ?: 0.0
+                if (qty > 0 && prc > 0.0) {
+                    coroutineScope.launch {
+                        purchaseViewModel.insert(Purchase(total = qty * prc))
+                        navController.popBackStack()
+                    }
+                }
             },
             modifier = Modifier.align(Alignment.End)
         ) {

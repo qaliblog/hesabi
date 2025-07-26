@@ -101,8 +101,8 @@ fun NavGraph() {
             composable(Screen.Wallet.route) { WalletScreen(navController, walletTransactionViewModel) }
             composable(Screen.AddProduct.route) { AddProductScreen(navController, productViewModel) }
             composable(Screen.AddSale.route) { AddSaleScreen(navController, productViewModel, saleViewModel) }
-            composable(Screen.AddPurchase.route) { AddPurchaseScreen(navController, productViewModel) }
-            composable(Screen.AddWalletTransaction.route) { AddWalletTransactionScreen(navController) }
+            composable(Screen.AddPurchase.route) { AddPurchaseScreen(navController, productViewModel, purchaseViewModel) }
+            composable(Screen.AddWalletTransaction.route) { AddWalletTransactionScreen(navController, walletTransactionViewModel) }
         }
     }
 }
