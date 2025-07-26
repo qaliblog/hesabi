@@ -28,7 +28,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.dp
 import com.qali.hesabi.data.Product
 import com.qali.hesabi.components.BarcodeView
-import com.qali.hesabi.util.PermissionRequester
+import com.qali.hesabi.util.rememberRequestStoragePermission
 import android.content.ContentValues
 import android.graphics.Bitmap
 import android.os.Environment
@@ -72,10 +72,11 @@ fun ProductCard(product: Product) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     val context = LocalContext.current
                     val coroutineScope = rememberCoroutineScope()
+                    val requestPermission = rememberRequestStoragePermission()
 
                     BarcodeView(barcode = product.barcode)
                     IconButton(onClick = {
-                        PermissionRequester.request?.invoke()
+                        requestPermission()
                         coroutineScope.launch {
                             val barcodeEncoder = BarcodeEncoder()
                             val bitmap = barcodeEncoder.encodeBitmap(product.barcode, BarcodeFormat.CODE_128, 400, 150)
