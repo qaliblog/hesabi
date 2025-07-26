@@ -39,8 +39,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun AddProductScreen(navController: NavController, productViewModel: ProductViewModel) {
     var name by remember { mutableStateOf("") }
-    var price by remember { mutableStateOf("") }
-    var quantity by remember { mutableStateOf("") }
+    var price by remember { mutableStateOf(0.0) }
+    var quantity by remember { mutableStateOf(0) }
     var barcode by remember { mutableStateOf("") }
 
     val scannerLauncher = rememberLauncherForActivityResult(
@@ -68,15 +68,15 @@ fun AddProductScreen(navController: NavController, productViewModel: ProductView
         )
         Spacer(modifier = Modifier.height(12.dp))
         OutlinedTextField(
-            value = price,
-            onValueChange = { price = it.filter { c -> c.isDigit() } },
+            value = price.toString(),
+            onValueChange = { price = it.toDoubleOrNull() ?: 0.0 },
             label = { Text("قیمت (تومان)") },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(12.dp))
         OutlinedTextField(
-            value = quantity,
-            onValueChange = { quantity = it.filter { c -> c.isDigit() } },
+            value = quantity.toString(),
+            onValueChange = { quantity = it.toIntOrNull() ?: 0 },
             label = { Text("تعداد") },
             modifier = Modifier.fillMaxWidth()
         )
@@ -115,8 +115,8 @@ fun AddProductScreen(navController: NavController, productViewModel: ProductView
                     productViewModel.insert(
                         Product(
                             name = name,
-                            price = price.toDouble(),
-                            quantity = quantity.toInt(),
+                            price = price,
+                            quantity = quantity,
                             barcode = barcode
                         )
                     )
