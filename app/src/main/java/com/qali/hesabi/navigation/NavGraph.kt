@@ -95,18 +95,6 @@ fun NavGraph() {
             }
         }
     ) { innerPadding ->
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp, end = 24.dp, start = 24.dp),
-            horizontalArrangement = Arrangement.End
-        ) {
-            Text(
-                text = "حسابی",
-                style = MaterialTheme.typography.displayLarge,
-                color = MaterialTheme.colorScheme.primary
-            )
-        }
         NavHost(
             navController = navController,
             startDestination = Screen.Products.route,
