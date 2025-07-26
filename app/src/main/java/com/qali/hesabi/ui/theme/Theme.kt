@@ -6,33 +6,34 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.Typography
 import androidx.compose.material3.Shapes
+import androidx.compose.material3.ColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 private val LightColors = lightColorScheme(
-    primary = Color(0xFF00695C),
-    onPrimary = Color.White,
-    secondary = Color(0xFF26A69A),
-    onSecondary = Color.White,
-    background = Color(0xFFF1F8E9),
-    onBackground = Color(0xFF263238),
-    surface = Color.White,
-    onSurface = Color(0xFF263238),
-    error = Color(0xFFD32F2F),
-    onError = Color.White
+    primary = md_theme_light_primary,
+    onPrimary = md_theme_light_onPrimary,
+    secondary = md_theme_light_secondary,
+    onSecondary = md_theme_light_onSecondary,
+    background = md_theme_light_background,
+    onBackground = md_theme_light_onBackground,
+    surface = md_theme_light_surface,
+    onSurface = md_theme_light_onSurface,
+    error = md_theme_light_error,
+    onError = md_theme_light_onError
 )
 
 private val DarkColors = darkColorScheme(
-    primary = Color(0xFF26A69A),
-    onPrimary = Color.Black,
-    secondary = Color(0xFF80CBC4),
-    onSecondary = Color.Black,
-    background = Color(0xFF263238),
-    onBackground = Color.White,
-    surface = Color(0xFF37474F),
-    onSurface = Color.White,
-    error = Color(0xFFEF9A9A),
-    onError = Color.Black
+    primary = md_theme_dark_primary,
+    onPrimary = md_theme_dark_onPrimary,
+    secondary = md_theme_dark_secondary,
+    onSecondary = md_theme_dark_onSecondary,
+    background = md_theme_dark_background,
+    onBackground = md_theme_dark_onBackground,
+    surface = md_theme_dark_surface,
+    onSurface = md_theme_dark_onSurface,
+    error = md_theme_dark_error,
+    onError = md_theme_dark_onError
 )
 
 @Composable
@@ -43,8 +44,8 @@ fun HesabiTheme(
     val colors = if (darkTheme) DarkColors else LightColors
     MaterialTheme(
         colorScheme = colors,
-        typography = Typography(),
-        shapes = Shapes(),
+        typography = Typography,
+        shapes = Shapes,
         content = content
     )
 }

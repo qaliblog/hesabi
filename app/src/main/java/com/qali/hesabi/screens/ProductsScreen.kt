@@ -22,33 +22,65 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.qali.hesabi.ui.ProductViewModel
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.material3.CardDefaults
 
 @Composable
 fun ProductsScreen(navController: NavController, productViewModel: ProductViewModel) {
     val products by productViewModel.allProducts.collectAsState(initial = emptyList())
+    val gradient = Brush.verticalGradient(
+        colors = listOf(
+            MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+            MaterialTheme.colorScheme.background
+        )
+    )
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .background(gradient)
+            .padding(24.dp)
     ) {
-        Text(
-            text = "محصولات",
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
+        androidx.compose.material3.Card(
+            shape = MaterialTheme.shapes.large,
+            elevation = CardDefaults.cardElevation(4.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 20.dp)
+        ) {
+            Text(
+                text = "محصولات",
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                modifier = Modifier.padding(20.dp)
+            )
+        }
         LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.weight(1f)
         ) {
             items(products) { product ->
                 ProductCard(product = product)
             }
         }
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
         Button(
             onClick = { navController.navigate(Screen.AddProduct.route) },
-            modifier = Modifier.align(Alignment.End)
+            modifier = Modifier
+                .align(Alignment.End)
+                .height(56.dp)
+                .width(220.dp),
+            shape = MaterialTheme.shapes.medium,
+            colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ),
+            elevation = androidx.compose.material3.ButtonDefaults.buttonElevation(8.dp)
         ) {
-            Text("افزودن محصول جدید")
+            Text("افزودن محصول جدید", style = MaterialTheme.typography.titleLarge)
         }
     }
 }

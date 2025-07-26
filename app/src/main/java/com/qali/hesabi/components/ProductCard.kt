@@ -52,6 +52,7 @@ import android.util.Log
 import android.widget.Toast
 
 import androidx.compose.foundation.border
+import androidx.compose.ui.graphics.Brush
 
 @Composable
 fun ProductCard(product: Product) {
@@ -59,18 +60,25 @@ fun ProductCard(product: Product) {
     val coroutineScope = rememberCoroutineScope()
     val requestPermission = rememberRequestStoragePermission()
     var downloadStatus by remember { mutableStateOf<DownloadStatus>(DownloadStatus.Idle) }
-    
+    val cardGradient = Brush.horizontalGradient(
+        colors = listOf(
+            MaterialTheme.colorScheme.primary.copy(alpha = 0.10f),
+            MaterialTheme.colorScheme.secondary.copy(alpha = 0.10f)
+        )
+    )
     Card(
-        shape = RoundedCornerShape(20.dp),
-        elevation = CardDefaults.cardElevation(0.dp),
+        shape = MaterialTheme.shapes.large,
+        elevation = CardDefaults.cardElevation(8.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(20.dp))
+            .background(cardGradient, MaterialTheme.shapes.large)
+            .border(2.dp, MaterialTheme.colorScheme.primary, MaterialTheme.shapes.large)
+            .padding(bottom = 4.dp)
     ) {
         Column(
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.surface)
-                .padding(16.dp)
+                .background(Color.Transparent)
+                .padding(20.dp)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -78,12 +86,24 @@ fun ProductCard(product: Product) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column {
-                    Text(text = product.name, style = MaterialTheme.typography.titleLarge)
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(text = "قیمت: ${product.price} تومان", style = MaterialTheme.typography.bodyMedium)
-                    Text(text = "تعداد: ${product.quantity}", style = MaterialTheme.typography.bodyMedium)
+                    Text(
+                        text = product.name,
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = "قیمت: ${product.price} تومان",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = "تعداد: ${product.quantity}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
                 }
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(16.dp))
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     BarcodeView(barcode = product.barcode)
                     IconButton(
@@ -108,13 +128,19 @@ fun ProductCard(product: Product) {
                                     Toast.makeText(context, "خطا در دانلود بارکد: ${e.message}", Toast.LENGTH_SHORT).show()
                                 }
                             }
-                        }
+                        },
+                        modifier = Modifier
+                            .background(
+                                color = MaterialTheme.colorScheme.primary,
+                                shape = MaterialTheme.shapes.small
+                            )
+                            .padding(4.dp)
                     ) {
                         when (downloadStatus) {
-                            DownloadStatus.Idle -> Icon(Icons.Filled.ArrowDownward, contentDescription = "دانلود بارکد")
-                            DownloadStatus.Downloading -> Icon(Icons.Filled.ArrowDownward, contentDescription = "در حال دانلود")
-                            DownloadStatus.Success -> Icon(Icons.Filled.Check, contentDescription = "دانلود شد")
-                            DownloadStatus.Error -> Icon(Icons.Filled.Error, contentDescription = "خطا")
+                            DownloadStatus.Idle -> Icon(Icons.Filled.ArrowDownward, contentDescription = "دانلود بارکد", tint = MaterialTheme.colorScheme.onPrimary)
+                            DownloadStatus.Downloading -> Icon(Icons.Filled.ArrowDownward, contentDescription = "در حال دانلود", tint = MaterialTheme.colorScheme.onPrimary)
+                            DownloadStatus.Success -> Icon(Icons.Filled.Check, contentDescription = "دانلود شد", tint = MaterialTheme.colorScheme.tertiary)
+                            DownloadStatus.Error -> Icon(Icons.Filled.Error, contentDescription = "خطا", tint = MaterialTheme.colorScheme.error)
                         }
                     }
                 }
