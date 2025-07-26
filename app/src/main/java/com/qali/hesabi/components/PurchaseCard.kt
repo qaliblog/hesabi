@@ -7,9 +7,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -34,9 +37,17 @@ import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.layout.Box
 import com.qali.hesabi.data.PurchaseItem
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import com.qali.hesabi.util.ReceiptUtils
+import kotlinx.coroutines.launch
+import android.widget.Toast
 
 @Composable
 fun PurchaseCard(purchase: Purchase) {
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+
     Card(
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(0.dp),
@@ -91,6 +102,30 @@ fun PurchaseCard(purchase: Purchase) {
                     ),
                     modifier = Modifier.fillMaxWidth()
                 )
+                Spacer(modifier = Modifier.height(12.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    IconButton(
+                        onClick = {
+                            coroutineScope.launch {
+                                val filePath = ReceiptUtils.saveReceiptAsPng(context, purchase)
+                                if (filePath != null) {
+                                    Toast.makeText(context, "رسید در پوشه Pictures/HesabiReceipts ذخیره شد", Toast.LENGTH_LONG).show()
+                                } else {
+                                    Toast.makeText(context, "خطا در ذخیره رسید", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
+                    ) {
+                        Icon(
+                            Icons.Filled.Download,
+                            contentDescription = "دانلود رسید",
+                            tint = Color(0xFF1976D2)
+                        )
+                    }
+                }
             }
         }
     }
