@@ -98,8 +98,7 @@ fun NavGraph() {
                             .wrapContentWidth(Alignment.End),
                         textAlign = TextAlign.Right
                     )
-                },
-                backgroundColor = MaterialTheme.colorScheme.background
+                }
             )
         },
         bottomBar = {
