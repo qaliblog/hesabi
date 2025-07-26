@@ -31,9 +31,13 @@ import androidx.navigation.NavController
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.compose.runtime.rememberCoroutineScope
+import com.hesabi.data.Product
+import com.hesabi.ui.ProductViewModel
+import kotlinx.coroutines.launch
 
 @Composable
-fun AddProductScreen(navController: NavController) {
+fun AddProductScreen(navController: NavController, productViewModel: ProductViewModel) {
     var name by remember { mutableStateOf("") }
     var price by remember { mutableStateOf("") }
     var quantity by remember { mutableStateOf("") }
@@ -86,12 +90,6 @@ fun AddProductScreen(navController: NavController) {
             )
             Spacer(modifier = Modifier.width(8.dp))
             IconButton(onClick = {
-                val randomBarcode = (0..9).shuffled().joinToString("").substring(0, 13)
-                barcode = randomBarcode
-            }) {
-                Icon(Icons.Filled.QrCodeScanner, contentDescription = "تولید بارکد")
-            }
-            IconButton(onClick = {
                 val options = ScanOptions()
                 options.setDesiredBarcodeFormats(ScanOptions.ALL_CODE_TYPES)
                 options.setPrompt("Scan a barcode")
@@ -100,13 +98,29 @@ fun AddProductScreen(navController: NavController) {
                 options.setBarcodeImageEnabled(true)
                 scannerLauncher.launch(options)
             }) {
+                Icon(Icons.Filled.QrCodeScanner, contentDescription = "تولید بارکد")
+            }
+            IconButton(onClick = {
+                val randomBarcode = (0..9).shuffled().joinToString("").substring(0, 13)
+                barcode = randomBarcode
+            }) {
                 Icon(Icons.Filled.Camera, contentDescription = "اسکن بارکد")
             }
         }
+        val coroutineScope = rememberCoroutineScope()
         Spacer(modifier = Modifier.height(24.dp))
         Button(
             onClick = {
-                // TODO: Save product to database
+                coroutineScope.launch {
+                    productViewModel.insert(
+                        Product(
+                            name = name,
+                            price = price.toDouble(),
+                            quantity = quantity.toInt(),
+                            barcode = barcode
+                        )
+                    )
+                }
                 navController.popBackStack()
             },
             modifier = Modifier.align(Alignment.End)

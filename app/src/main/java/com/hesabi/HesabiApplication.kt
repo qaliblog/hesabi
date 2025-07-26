@@ -1,0 +1,8 @@
+package com.hesabi
+
+import android.app.Application
+import com.hesabi.data.AppDatabase
+
+class HesabiApplication : Application() {
+    val database: AppDatabase by lazy { AppDatabase.getDatabase(this) }
+}

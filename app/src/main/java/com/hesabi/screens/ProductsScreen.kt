@@ -18,9 +18,14 @@ import androidx.navigation.NavController
 import com.hesabi.components.ProductCard
 import androidx.compose.ui.unit.dp
 import com.hesabi.navigation.Screen
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import com.hesabi.ui.ProductViewModel
+import androidx.compose.foundation.lazy.items
 
 @Composable
-fun ProductsScreen(navController: NavController) {
+fun ProductsScreen(navController: NavController, productViewModel: ProductViewModel) {
+    val products by productViewModel.allProducts.collectAsState(initial = emptyList())
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -34,7 +39,9 @@ fun ProductsScreen(navController: NavController) {
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // TODO: Display products from database
+            items(products) { product ->
+                ProductCard(product = product)
+            }
         }
         Spacer(modifier = Modifier.height(16.dp))
         Button(

@@ -19,6 +19,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.hesabi.HesabiApplication
 import com.hesabi.screens.ProductsScreen
 import com.hesabi.screens.SalesScreen
 import com.hesabi.screens.PurchasesScreen
@@ -27,6 +30,8 @@ import com.hesabi.screens.AddProductScreen
 import com.hesabi.screens.AddSaleScreen
 import com.hesabi.screens.AddPurchaseScreen
 import com.hesabi.screens.AddWalletTransactionScreen
+import com.hesabi.ui.ProductViewModel
+import com.hesabi.ui.ProductViewModelFactory
 
 sealed class Screen(val route: String, val title: String, val icon: ImageVector? = null) {
     object Products : Screen("products", "محصولات", Icons.Filled.ShoppingCart)
@@ -49,6 +54,10 @@ val bottomNavItems = listOf(
 @Composable
 fun NavGraph() {
     val navController = rememberNavController()
+    val context = LocalContext.current
+    val productViewModel: ProductViewModel = viewModel(
+        factory = ProductViewModelFactory((context.applicationContext as HesabiApplication).database.productDao())
+    )
     Scaffold(
         bottomBar = {
             NavigationBar {
@@ -70,11 +79,11 @@ fun NavGraph() {
             startDestination = Screen.Products.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(Screen.Products.route) { ProductsScreen(navController) }
+            composable(Screen.Products.route) { ProductsScreen(navController, productViewModel) }
             composable(Screen.Sales.route) { SalesScreen(navController) }
             composable(Screen.Purchases.route) { PurchasesScreen(navController) }
             composable(Screen.Wallet.route) { WalletScreen(navController) }
-            composable(Screen.AddProduct.route) { AddProductScreen(navController) }
+            composable(Screen.AddProduct.route) { AddProductScreen(navController, productViewModel) }
             composable(Screen.AddSale.route) { AddSaleScreen(navController) }
             composable(Screen.AddPurchase.route) { AddPurchaseScreen(navController) }
             composable(Screen.AddWalletTransaction.route) { AddWalletTransactionScreen(navController) }
