@@ -44,11 +44,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.SmallTopAppBar
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.ui.graphics.Color
 
 sealed class Screen(val route: String, val title: String, val icon: ImageVector? = null) {
     object Products : Screen("products", "محصولات", Icons.Filled.ShoppingCart)
@@ -87,19 +89,20 @@ fun NavGraph() {
     
     Scaffold(
         topBar = {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp, end = 24.dp, start = 24.dp),
-                horizontalArrangement = Arrangement.End
-            ) {
-                Text(
-                    text = "حسابی",
-                    style = MaterialTheme.typography.displayLarge,
-                    color = MaterialTheme.colorScheme.primary,
-                    textAlign = TextAlign.Right
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "حسابی",
+                        style = MaterialTheme.typography.displayLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Right
+                    )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent
                 )
-            }
+            )
         },
         bottomBar = {
             NavigationBar {
