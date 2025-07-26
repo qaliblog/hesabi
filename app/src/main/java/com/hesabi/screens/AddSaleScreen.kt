@@ -28,7 +28,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.hesabi.data.SampleData
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,7 +58,7 @@ fun AddSaleScreen(navController: NavController) {
                 onExpandedChange = {}
             ) {
                 OutlinedTextField(
-                    value = SampleData.products[selectedProductIndex].name,
+                    value = "", // TODO: Get selected product name
                     onValueChange = {},
                     label = { Text("محصول") },
                     readOnly = true,

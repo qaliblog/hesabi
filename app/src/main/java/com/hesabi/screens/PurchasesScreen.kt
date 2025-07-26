@@ -16,8 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.navigation.NavController
 import com.hesabi.components.PurchaseCard
-import com.hesabi.data.SampleData
 import androidx.compose.ui.unit.dp
+import com.hesabi.navigation.Screen
 
 @Composable
 fun PurchasesScreen(navController: NavController) {
@@ -34,14 +34,11 @@ fun PurchasesScreen(navController: NavController) {
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(SampleData.purchases.size) { index ->
-                val purchase = SampleData.purchases[index]
-                PurchaseCard(purchase = purchase)
-            }
+            // TODO: Display purchases from database
         }
         Spacer(modifier = Modifier.height(16.dp))
         Button(
-            onClick = { /* TODO: Navigate to AddPurchaseScreen */ },
+            onClick = { navController.navigate(Screen.AddPurchase.route) },
             modifier = Modifier.align(Alignment.End)
         ) {
             Text("افزودن خرید جدید")

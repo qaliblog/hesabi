@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.navigation.NavController
 import com.hesabi.components.WalletCard
-import com.hesabi.data.SampleData
+import com.hesabi.navigation.Screen
 
 @Composable
 fun WalletScreen(navController: NavController) {
@@ -34,14 +34,11 @@ fun WalletScreen(navController: NavController) {
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(SampleData.walletTransactions.size) { index ->
-                val transaction = SampleData.walletTransactions[index]
-                WalletCard(transaction = transaction)
-            }
+            // TODO: Display wallet transactions from database
         }
         Spacer(modifier = Modifier.height(16.dp))
         Button(
-            onClick = { /* TODO: Navigate to AddWalletTransactionScreen */ },
+            onClick = { navController.navigate(Screen.AddWalletTransaction.route) },
             modifier = Modifier.align(Alignment.End)
         ) {
             Text("افزودن تراکنش جدید")

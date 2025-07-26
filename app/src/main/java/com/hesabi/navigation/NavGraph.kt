@@ -23,12 +23,20 @@ import com.hesabi.screens.ProductsScreen
 import com.hesabi.screens.SalesScreen
 import com.hesabi.screens.PurchasesScreen
 import com.hesabi.screens.WalletScreen
+import com.hesabi.screens.AddProductScreen
+import com.hesabi.screens.AddSaleScreen
+import com.hesabi.screens.AddPurchaseScreen
+import com.hesabi.screens.AddWalletTransactionScreen
 
-sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
+sealed class Screen(val route: String, val title: String, val icon: ImageVector? = null) {
     object Products : Screen("products", "محصولات", Icons.Filled.ShoppingCart)
     object Sales : Screen("sales", "فروش‌ها", Icons.Filled.List)
     object Purchases : Screen("purchases", "خریدها", Icons.Filled.Home)
     object Wallet : Screen("wallet", "کیف پول", Icons.Filled.ShoppingCart)
+    object AddProduct : Screen("add_product", "افزودن محصول")
+    object AddSale : Screen("add_sale", "افزودن فروش")
+    object AddPurchase : Screen("add_purchase", "افزودن خرید")
+    object AddWalletTransaction : Screen("add_wallet_transaction", "افزودن تراکنش")
 }
 
 val bottomNavItems = listOf(
@@ -50,7 +58,7 @@ fun NavGraph() {
                     NavigationBarItem(
                         selected = currentRoute == screen.route,
                         onClick = { navController.navigate(screen.route) },
-                        icon = { Icon(screen.icon, contentDescription = screen.title) },
+                        icon = { screen.icon?.let { Icon(it, contentDescription = screen.title) } },
                         label = { Text(screen.title) }
                     )
                 }
@@ -66,6 +74,10 @@ fun NavGraph() {
             composable(Screen.Sales.route) { SalesScreen(navController) }
             composable(Screen.Purchases.route) { PurchasesScreen(navController) }
             composable(Screen.Wallet.route) { WalletScreen(navController) }
+            composable(Screen.AddProduct.route) { AddProductScreen(navController) }
+            composable(Screen.AddSale.route) { AddSaleScreen(navController) }
+            composable(Screen.AddPurchase.route) { AddPurchaseScreen(navController) }
+            composable(Screen.AddWalletTransaction.route) { AddWalletTransactionScreen(navController) }
         }
     }
 }

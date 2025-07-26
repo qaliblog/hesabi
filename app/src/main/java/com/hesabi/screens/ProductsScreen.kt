@@ -16,8 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.navigation.NavController
 import com.hesabi.components.ProductCard
-import com.hesabi.data.SampleData
 import androidx.compose.ui.unit.dp
+import com.hesabi.navigation.Screen
 
 @Composable
 fun ProductsScreen(navController: NavController) {
@@ -34,14 +34,11 @@ fun ProductsScreen(navController: NavController) {
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(SampleData.products.size) { index ->
-                val product = SampleData.products[index]
-                ProductCard(product = product)
-            }
+            // TODO: Display products from database
         }
         Spacer(modifier = Modifier.height(16.dp))
         Button(
-            onClick = { /* TODO: Navigate to AddProductScreen */ },
+            onClick = { navController.navigate(Screen.AddProduct.route) },
             modifier = Modifier.align(Alignment.End)
         ) {
             Text("افزودن محصول جدید")
