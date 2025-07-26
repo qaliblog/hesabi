@@ -39,6 +39,7 @@ import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import kotlinx.coroutines.launch
 import java.io.OutputStream
+import android.util.Log
 
 import androidx.compose.foundation.border
 
@@ -90,6 +91,7 @@ fun ProductCard(product: Product) {
 }
 
 private fun saveBitmap(context: android.content.Context, bitmap: Bitmap, fileName: String) {
+    Log.d("ProductCard", "Saving bitmap with name: $fileName")
     val contentValues = ContentValues().apply {
         put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
         put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
@@ -99,10 +101,20 @@ private fun saveBitmap(context: android.content.Context, bitmap: Bitmap, fileNam
     val resolver = context.contentResolver
     val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
 
+    if (uri == null) {
+        Log.e("ProductCard", "Failed to create new MediaStore record.")
+        return
+    }
+
     uri?.let {
         val outputStream: OutputStream? = resolver.openOutputStream(it)
+        if (outputStream == null) {
+            Log.e("ProductCard", "Failed to get output stream.")
+            return
+        }
         outputStream?.use { stream ->
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+            Log.d("ProductCard", "Bitmap saved successfully.")
         }
     }
 }
