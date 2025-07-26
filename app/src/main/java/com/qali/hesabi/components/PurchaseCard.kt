@@ -64,9 +64,7 @@ fun PurchaseCard(purchase: Purchase) {
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF1976D2),
-                        textAlign = TextAlign.Right,
-                        textDirection = TextDirection.Rtl,
-                        locale = Locale("fa")
+                        textAlign = TextAlign.Right
                     ),
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -77,9 +75,7 @@ fun PurchaseCard(purchase: Purchase) {
                         style = TextStyle(
                             fontSize = 16.sp,
                             color = Color(0xFF333333),
-                            textAlign = TextAlign.Right,
-                            textDirection = TextDirection.Rtl,
-                            locale = Locale("fa")
+                            textAlign = TextAlign.Right
                         ),
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -91,9 +87,7 @@ fun PurchaseCard(purchase: Purchase) {
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFFD32F2F),
-                        textAlign = TextAlign.Right,
-                        textDirection = TextDirection.Rtl,
-                        locale = Locale("fa")
+                        textAlign = TextAlign.Right
                     ),
                     modifier = Modifier.fillMaxWidth()
                 )
