@@ -1,4 +1,4 @@
-package com.hesabi
+package com.qali.hesabi
 
 import android.app.Application
 import com.hesabi.data.AppDatabase
