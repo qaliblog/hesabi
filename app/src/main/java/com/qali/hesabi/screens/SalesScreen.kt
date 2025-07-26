@@ -26,6 +26,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.material3.CardDefaults
+import androidx.compose.foundation.layout.width
 
 @Composable
 fun SalesScreen(navController: NavController, saleViewModel: SaleViewModel) {
@@ -85,7 +86,7 @@ fun SalesScreen(navController: NavController, saleViewModel: SaleViewModel) {
             modifier = Modifier
                 .align(Alignment.End)
                 .height(56.dp)
-                .requiredWidth(220.dp),
+                .width(220.dp),
             shape = MaterialTheme.shapes.medium,
             colors = androidx.compose.material3.ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary,
