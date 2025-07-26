@@ -73,7 +73,7 @@ fun SaleCard(sale: Sale) {
                 IconButton(onClick = {
                     coroutineScope.launch {
                         val bitmap = generateReceiptBitmap(sale, dateString)
-                        val success = saveBitmap(context, bitmap, "sale-receipt-${sale.id}.png")
+                        val success = saveSaleReceiptBitmap(context, bitmap, "sale-receipt-${sale.id}.png")
                         Toast.makeText(context, if (success) "رسید ذخیره شد" else "خطا در ذخیره رسید", Toast.LENGTH_SHORT).show()
                     }
                 }) {
@@ -141,7 +141,7 @@ fun generateReceiptBitmap(sale: Sale, dateString: String): Bitmap {
     return bitmap
 }
 
-fun saveBitmap(context: android.content.Context, bitmap: Bitmap, fileName: String): Boolean {
+fun saveSaleReceiptBitmap(context: android.content.Context, bitmap: Bitmap, fileName: String): Boolean {
     return try {
         val contentValues = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
