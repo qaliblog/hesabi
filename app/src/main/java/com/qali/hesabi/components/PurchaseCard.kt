@@ -23,6 +23,17 @@ import androidx.compose.ui.unit.dp
 import com.qali.hesabi.data.Purchase
 
 import androidx.compose.foundation.border
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.style.TextDirection
+import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.layout.Box
+import com.qali.hesabi.data.PurchaseItem
 
 @Composable
 fun PurchaseCard(purchase: Purchase) {
@@ -33,18 +44,59 @@ fun PurchaseCard(purchase: Purchase) {
             .fillMaxWidth()
             .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(20.dp))
     ) {
-        Row(
+        Box(
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.surface)
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+                .background(
+                    brush = Brush.linearGradient(
+                        colors = listOf(Color(0xFFFAFAFA), Color(0xFFE0E0E0)),
+                        tileMode = TileMode.Clamp
+                    )
+                )
+                .padding(16.dp)
         ) {
-            Column {
-                Text(text = "جمع کل: ${purchase.total} تومان", style = MaterialTheme.typography.titleMedium)
-            }
-            IconButton(onClick = { /* TODO: Download receipt as PNG */ }) {
-                Icon(Icons.Filled.ArrowDownward, contentDescription = "دانلود رسید")
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.End
+            ) {
+                Text(
+                    text = "رسید خرید",
+                    style = TextStyle(
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF1976D2),
+                        textAlign = TextAlign.Right,
+                        textDirection = TextDirection.Rtl,
+                        locale = Locale("fa")
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                purchase.items.forEach { item ->
+                    Text(
+                        text = "${item.productName}  |  تعداد: ${item.quantity}  |  قیمت واحد: ${item.price} تومان",
+                        style = TextStyle(
+                            fontSize = 16.sp,
+                            color = Color(0xFF333333),
+                            textAlign = TextAlign.Right,
+                            textDirection = TextDirection.Rtl,
+                            locale = Locale("fa")
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "جمع کل: ${purchase.total} تومان",
+                    style = TextStyle(
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFFD32F2F),
+                        textAlign = TextAlign.Right,
+                        textDirection = TextDirection.Rtl,
+                        locale = Locale("fa")
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
     }

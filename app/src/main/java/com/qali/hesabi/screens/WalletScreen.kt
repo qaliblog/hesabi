@@ -26,11 +26,17 @@ import com.qali.hesabi.ui.WalletTransactionViewModel
 @Composable
 fun WalletScreen(navController: NavController, walletTransactionViewModel: WalletTransactionViewModel) {
     val transactions by walletTransactionViewModel.allTransactions.collectAsState(initial = emptyList())
+    val overallAmount = transactions.sumOf { if (it.type.name == "INCOME") it.amount else -it.amount }
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
+        Text(
+            text = "موجودی کل: ${overallAmount} تومان",
+            style = MaterialTheme.typography.headlineSmall,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
         Text(
             text = "کیف پول",
             style = MaterialTheme.typography.headlineMedium,

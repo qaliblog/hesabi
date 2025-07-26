@@ -32,7 +32,7 @@ fun PurchasesScreen(navController: NavController, purchaseViewModel: PurchaseVie
             .padding(16.dp)
     ) {
         Text(
-            text = "خریدها",
+            text = "رسیدهای خرید",
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(bottom = 16.dp)
         )

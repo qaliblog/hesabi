@@ -47,6 +47,7 @@ import com.qali.hesabi.data.Purchase
 import com.qali.hesabi.ui.PurchaseViewModel
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
+import com.qali.hesabi.data.PurchaseItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,6 +57,7 @@ fun AddPurchaseScreen(navController: NavController, productViewModel: ProductVie
     var price by remember { mutableStateOf("") }
     var showProductDialog by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
+    var purchaseItems by remember { mutableStateOf(listOf<PurchaseItem>()) }
     
     val products by productViewModel.allProducts.collectAsState(initial = emptyList())
     val filteredProducts = products.filter { 
@@ -114,7 +116,6 @@ fun AddPurchaseScreen(navController: NavController, productViewModel: ProductVie
                 Icon(Icons.Filled.Add, contentDescription = "انتخاب محصول")
             }
         }
-        
         Spacer(modifier = Modifier.height(12.dp))
         OutlinedTextField(
             value = quantity,
@@ -129,14 +130,45 @@ fun AddPurchaseScreen(navController: NavController, productViewModel: ProductVie
             label = { Text("قیمت (تومان)") },
             modifier = Modifier.fillMaxWidth()
         )
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(12.dp))
         Button(
             onClick = {
                 val qty = quantity.toIntOrNull() ?: 0
                 val prc = price.toDoubleOrNull() ?: 0.0
-                if (qty > 0 && prc > 0.0) {
+                if (selectedProduct != null && qty > 0 && prc > 0.0) {
+                    val item = PurchaseItem(
+                        productId = selectedProduct!!.id,
+                        productName = selectedProduct!!.name,
+                        quantity = qty,
+                        price = prc,
+                        barcode = selectedProduct!!.barcode
+                    )
+                    purchaseItems = purchaseItems + item
+                    selectedProduct = null
+                    quantity = ""
+                    price = ""
+                }
+            },
+            modifier = Modifier.align(Alignment.End)
+        ) {
+            Text("افزودن به لیست خرید")
+        }
+        Spacer(modifier = Modifier.height(24.dp))
+        if (purchaseItems.isNotEmpty()) {
+            Text("لیست اقلام خریداری شده:", style = MaterialTheme.typography.titleMedium)
+            LazyColumn(modifier = Modifier.height(120.dp)) {
+                items(purchaseItems) { item ->
+                    Text("${item.productName} - تعداد: ${item.quantity} - قیمت: ${item.price} تومان")
+                }
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+        }
+        Button(
+            onClick = {
+                if (purchaseItems.isNotEmpty()) {
+                    val total = purchaseItems.sumOf { it.price * it.quantity }
                     coroutineScope.launch {
-                        purchaseViewModel.insert(Purchase(total = qty * prc))
+                        purchaseViewModel.insert(Purchase(total = total, items = purchaseItems))
                         navController.popBackStack()
                     }
                 }

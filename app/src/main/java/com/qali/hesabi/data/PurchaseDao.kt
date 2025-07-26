@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PurchaseDao {
-    @Query("SELECT * FROM purchases ORDER BY id DESC")
+    @Query("SELECT * FROM purchases ORDER BY id DESC") // Now includes items and date
     fun getAllPurchases(): Flow<List<Purchase>>
 
     @Insert
