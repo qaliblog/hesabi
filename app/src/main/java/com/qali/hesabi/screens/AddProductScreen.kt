@@ -34,6 +34,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.runtime.rememberCoroutineScope
 import com.qali.hesabi.data.Product
 import com.qali.hesabi.ui.ProductViewModel
+import com.qali.hesabi.util.toEnglishNumbers
 import kotlinx.coroutines.launch
 
 @Composable
@@ -68,15 +69,15 @@ fun AddProductScreen(navController: NavController, productViewModel: ProductView
         )
         Spacer(modifier = Modifier.height(12.dp))
         OutlinedTextField(
-            value = price.toString(),
-            onValueChange = { price = it.toDoubleOrNull() ?: 0.0 },
+            value = if (price == 0.0) "" else price.toString(),
+            onValueChange = { price = it.toEnglishNumbers().toDoubleOrNull() ?: 0.0 },
             label = { Text("قیمت (تومان)") },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(12.dp))
         OutlinedTextField(
-            value = quantity.toString(),
-            onValueChange = { quantity = it.toIntOrNull() ?: 0 },
+            value = if (quantity == 0) "" else quantity.toString(),
+            onValueChange = { quantity = it.toEnglishNumbers().toIntOrNull() ?: 0 },
             label = { Text("تعداد") },
             modifier = Modifier.fillMaxWidth()
         )
@@ -101,7 +102,7 @@ fun AddProductScreen(navController: NavController, productViewModel: ProductView
                 Icon(Icons.Filled.QrCodeScanner, contentDescription = "تولید بارکد")
             }
             IconButton(onClick = {
-                val randomBarcode = (0..9).shuffled().joinToString("").substring(0, 13)
+                val randomBarcode = (1..13).map { (0..9).random() }.joinToString("")
                 barcode = randomBarcode
             }) {
                 Icon(Icons.Filled.Camera, contentDescription = "اسکن بارکد")
