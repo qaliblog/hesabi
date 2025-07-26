@@ -50,7 +50,8 @@ fun AddPurchaseScreen(navController: NavController) {
                 onExpandedChange = {}
             ) {
                 OutlinedTextField(
-                    value = "", // TODO: Get selected product name
+                    value = "",
+                    // TODO: Get selected product name
                     onValueChange = {},
                     label = { Text("محصول") },
                     readOnly = true,
