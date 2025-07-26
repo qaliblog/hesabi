@@ -42,6 +42,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import android.os.Build
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.graphics.Color as ComposeColor
+import androidx.compose.foundation.layout.Box
 
 @Composable
 fun SaleCard(sale: Sale) {
@@ -57,90 +64,163 @@ fun SaleCard(sale: Sale) {
             .fillMaxWidth()
             .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(20.dp))
     ) {
-        Column(
+        Box(
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.surface)
+                .background(
+                    brush = Brush.linearGradient(
+                        colors = listOf(ComposeColor(0xFFFAFAFA), ComposeColor(0xFFE0E0E0)),
+                        tileMode = TileMode.Clamp
+                    )
+                )
                 .padding(16.dp)
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.End
             ) {
-                Column {
-                    Text(text = "خریدار: ${sale.buyerName}", style = MaterialTheme.typography.titleMedium)
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(text = "تاریخ: $dateString", style = MaterialTheme.typography.bodySmall)
-                    Text(text = "جمع کل: ${sale.total} تومان", style = MaterialTheme.typography.bodyMedium)
-                }
-                IconButton(onClick = {
-                    coroutineScope.launch {
-                        val bitmap = generateReceiptBitmap(sale, dateString)
-                        val success = saveSaleReceiptBitmap(context, bitmap, "sale-receipt-${sale.id}.png")
-                        Toast.makeText(context, if (success) "رسید ذخیره شد" else "خطا در ذخیره رسید", Toast.LENGTH_SHORT).show()
-                    }
-                }) {
-                    Icon(Icons.Filled.ArrowDownward, contentDescription = "دانلود رسید")
-                }
-            }
-            
-            if (sale.products.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    text = "محصولات:",
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.primary
+                    text = "رسید فروش",
+                    style = androidx.compose.ui.text.TextStyle(
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = ComposeColor(0xFF1976D2),
+                        textAlign = TextAlign.Right
+                    ),
+                    modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                
-                sale.products.forEach { item ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
+                Text(
+                    text = "خریدار: ${sale.buyerName}",
+                    style = androidx.compose.ui.text.TextStyle(
+                        fontSize = 16.sp,
+                        color = ComposeColor(0xFF333333),
+                        textAlign = TextAlign.Right
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Text(
+                    text = "تاریخ: $dateString",
+                    style = androidx.compose.ui.text.TextStyle(
+                        fontSize = 14.sp,
+                        color = ComposeColor(0xFF333333),
+                        textAlign = TextAlign.Right
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                if (sale.products.isNotEmpty()) {
+                    Text(
+                        text = "محصولات:",
+                        style = androidx.compose.ui.text.TextStyle(
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = ComposeColor(0xFF1976D2),
+                            textAlign = TextAlign.Right
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    sale.products.forEach { item ->
                         Text(
-                            text = "${item.productName} (${item.quantity} عدد)",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                        Text(
-                            text = "${item.price * item.quantity} تومان",
-                            style = MaterialTheme.typography.bodyMedium
+                            text = "${item.productName}  |  تعداد: ${item.quantity}  |  قیمت واحد: ${item.price} تومان",
+                            style = androidx.compose.ui.text.TextStyle(
+                                fontSize = 15.sp,
+                                color = ComposeColor(0xFF333333),
+                                textAlign = TextAlign.Right
+                            ),
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
-                    Spacer(modifier = Modifier.height(4.dp))
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = "جمع کل: ${sale.total} تومان",
+                    style = androidx.compose.ui.text.TextStyle(
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = ComposeColor(0xFFD32F2F),
+                        textAlign = TextAlign.Right
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    IconButton(onClick = {
+                        coroutineScope.launch {
+                            val bitmap = generateReceiptBitmapStyled(sale, dateString)
+                            val success = saveSaleReceiptBitmap(context, bitmap, "sale-receipt-${sale.id}.png")
+                            Toast.makeText(context, if (success) "رسید ذخیره شد" else "خطا در ذخیره رسید", Toast.LENGTH_SHORT).show()
+                        }
+                    }) {
+                        Icon(Icons.Filled.ArrowDownward, contentDescription = "دانلود رسید", tint = ComposeColor(0xFF1976D2))
+                    }
                 }
             }
         }
     }
 }
 
-fun generateReceiptBitmap(sale: Sale, dateString: String): Bitmap {
-    val width = 600
+fun generateReceiptBitmapStyled(sale: Sale, dateString: String): Bitmap {
+    val width = 800
     val height = 300 + sale.products.size * 60
     val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
     val canvas = Canvas(bitmap)
-    val paint = Paint().apply {
-        color = AndroidColor.BLACK
-        textSize = 32f
+    // Gradient background
+    val paintBg = Paint()
+    paintBg.shader = android.graphics.LinearGradient(
+        0f, 0f, 0f, height.toFloat(),
+        AndroidColor.parseColor("#FAFAFA"),
+        AndroidColor.parseColor("#E0E0E0"),
+        android.graphics.Shader.TileMode.CLAMP
+    )
+    canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paintBg)
+    // Title
+    val titlePaint = Paint().apply {
+        color = AndroidColor.parseColor("#1976D2")
+        textSize = 44f
+        isFakeBoldText = true
+        textAlign = Paint.Align.RIGHT
         isAntiAlias = true
     }
-    canvas.drawColor(AndroidColor.WHITE)
-    var y = 50
-    canvas.drawText("رسید فروش", 220f, y.toFloat(), paint)
-    y += 50
-    canvas.drawText("خریدار: ${sale.buyerName}", 30f, y.toFloat(), paint)
-    y += 40
-    canvas.drawText("تاریخ: $dateString", 30f, y.toFloat(), paint)
-    y += 40
-    canvas.drawText("محصولات:", 30f, y.toFloat(), paint)
-    y += 40
-    sale.products.forEach {
-        canvas.drawText("${it.productName} (${it.quantity} عدد) - ${it.price * it.quantity} تومان", 30f, y.toFloat(), paint)
-        y += 40
+    val itemPaint = Paint().apply {
+        color = AndroidColor.parseColor("#333333")
+        textSize = 32f
+        textAlign = Paint.Align.RIGHT
+        isAntiAlias = true
     }
-    y += 20
-    paint.textSize = 36f
-    canvas.drawText("جمع کل: ${sale.total} تومان", 30f, y.toFloat(), paint)
+    val totalPaint = Paint().apply {
+        color = AndroidColor.parseColor("#D32F2F")
+        textSize = 36f
+        isFakeBoldText = true
+        textAlign = Paint.Align.RIGHT
+        isAntiAlias = true
+    }
+    val labelPaint = Paint().apply {
+        color = AndroidColor.parseColor("#1976D2")
+        textSize = 32f
+        isFakeBoldText = true
+        textAlign = Paint.Align.RIGHT
+        isAntiAlias = true
+    }
+    var y = 80f
+    canvas.drawText("رسید فروش", width - 40f, y, titlePaint)
+    y += 60f
+    canvas.drawText("خریدار: ${sale.buyerName}", width - 40f, y, itemPaint)
+    y += 40f
+    canvas.drawText("تاریخ: $dateString", width - 40f, y, itemPaint)
+    y += 40f
+    canvas.drawText("محصولات:", width - 40f, y, labelPaint)
+    y += 40f
+    sale.products.forEach {
+        val itemText = "${it.productName}  |  تعداد: ${it.quantity}  |  قیمت واحد: ${it.price} تومان"
+        canvas.drawText(itemText, width - 40f, y, itemPaint)
+        y += 40f
+    }
+    y += 20f
+    canvas.drawText("جمع کل: ${sale.total} تومان", width - 40f, y, totalPaint)
     return bitmap
 }
 
