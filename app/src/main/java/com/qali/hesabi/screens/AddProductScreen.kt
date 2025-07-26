@@ -90,22 +90,24 @@ fun AddProductScreen(navController: NavController, productViewModel: ProductView
                 modifier = Modifier.weight(1f)
             )
             Spacer(modifier = Modifier.width(8.dp))
-            IconButton(onClick = {
-                val options = ScanOptions()
-                options.setDesiredBarcodeFormats(ScanOptions.ALL_CODE_TYPES)
-                options.setPrompt("Scan a barcode")
-                options.setCameraId(0)
-                options.setBeepEnabled(false)
-                options.setBarcodeImageEnabled(true)
-                scannerLauncher.launch(options)
-            }) {
-                Icon(Icons.Filled.QrCodeScanner, contentDescription = "تولید بارکد")
+            IconButton(
+                onClick = {
+                    val options = ScanOptions()
+                    options.setDesiredBarcodeFormats(ScanOptions.ALL_CODE_TYPES)
+                    options.setPrompt("اسکن بارکد محصول")
+                    options.setCameraId(0)
+                    options.setBeepEnabled(false)
+                    options.setBarcodeImageEnabled(true)
+                    scannerLauncher.launch(options)
+                }
+            ) {
+                Icon(Icons.Filled.Camera, contentDescription = "اسکن بارکد")
             }
             IconButton(onClick = {
                 val randomBarcode = (1..13).map { (0..9).random() }.joinToString("")
                 barcode = randomBarcode
             }) {
-                Icon(Icons.Filled.Camera, contentDescription = "اسکن بارکد")
+                Icon(Icons.Filled.QrCodeScanner, contentDescription = "تولید بارکد تصادفی")
             }
         }
         val coroutineScope = rememberCoroutineScope()

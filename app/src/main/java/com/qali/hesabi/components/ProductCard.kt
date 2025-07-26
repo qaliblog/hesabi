@@ -13,18 +13,28 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Snackbar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.qali.hesabi.data.Product
 import com.qali.hesabi.components.BarcodeView
@@ -33,18 +43,23 @@ import android.content.ContentValues
 import android.graphics.Bitmap
 import android.os.Environment
 import android.provider.MediaStore
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.LaunchedEffect
 import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import kotlinx.coroutines.launch
 import java.io.OutputStream
 import android.util.Log
+import android.widget.Toast
 
 import androidx.compose.foundation.border
 
 @Composable
 fun ProductCard(product: Product) {
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val requestPermission = rememberRequestStoragePermission()
+    var downloadStatus by remember { mutableStateOf<DownloadStatus>(DownloadStatus.Idle) }
+    
     Card(
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(0.dp),
@@ -70,20 +85,37 @@ fun ProductCard(product: Product) {
                 }
                 Spacer(modifier = Modifier.width(12.dp))
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    val context = LocalContext.current
-                    val coroutineScope = rememberCoroutineScope()
-                    val requestPermission = rememberRequestStoragePermission()
-
                     BarcodeView(barcode = product.barcode)
-                    IconButton(onClick = {
-                        requestPermission()
-                        coroutineScope.launch {
-                            val barcodeEncoder = BarcodeEncoder()
-                            val bitmap = barcodeEncoder.encodeBitmap(product.barcode, BarcodeFormat.CODE_128, 400, 150)
-                            saveBitmap(context, bitmap, "${product.name}-barcode.png")
+                    IconButton(
+                        onClick = {
+                            coroutineScope.launch {
+                                downloadStatus = DownloadStatus.Downloading
+                                try {
+                                    requestPermission()
+                                    val barcodeEncoder = BarcodeEncoder()
+                                    val bitmap = barcodeEncoder.encodeBitmap(product.barcode, BarcodeFormat.CODE_128, 400, 150)
+                                    val success = saveBitmap(context, bitmap, "${product.name}-barcode.png")
+                                    if (success) {
+                                        downloadStatus = DownloadStatus.Success
+                                        Toast.makeText(context, "بارکد با موفقیت دانلود شد", Toast.LENGTH_SHORT).show()
+                                    } else {
+                                        downloadStatus = DownloadStatus.Error
+                                        Toast.makeText(context, "خطا در دانلود بارکد", Toast.LENGTH_SHORT).show()
+                                    }
+                                } catch (e: Exception) {
+                                    Log.e("ProductCard", "Error downloading barcode", e)
+                                    downloadStatus = DownloadStatus.Error
+                                    Toast.makeText(context, "خطا در دانلود بارکد: ${e.message}", Toast.LENGTH_SHORT).show()
+                                }
+                            }
                         }
-                    }) {
-                        Icon(Icons.Filled.ArrowDownward, contentDescription = "دانلود بارکد")
+                    ) {
+                        when (downloadStatus) {
+                            DownloadStatus.Idle -> Icon(Icons.Filled.ArrowDownward, contentDescription = "دانلود بارکد")
+                            DownloadStatus.Downloading -> Icon(Icons.Filled.ArrowDownward, contentDescription = "در حال دانلود")
+                            DownloadStatus.Success -> Icon(Icons.Filled.Check, contentDescription = "دانلود شد")
+                            DownloadStatus.Error -> Icon(Icons.Filled.Error, contentDescription = "خطا")
+                        }
                     }
                 }
             }
@@ -91,31 +123,43 @@ fun ProductCard(product: Product) {
     }
 }
 
-private fun saveBitmap(context: android.content.Context, bitmap: Bitmap, fileName: String) {
-    Log.d("ProductCard", "Saving bitmap with name: $fileName")
-    val contentValues = ContentValues().apply {
-        put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
-        put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
-        put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
-    }
+sealed class DownloadStatus {
+    object Idle : DownloadStatus()
+    object Downloading : DownloadStatus()
+    object Success : DownloadStatus()
+    object Error : DownloadStatus()
+}
 
-    val resolver = context.contentResolver
-    val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+private fun saveBitmap(context: android.content.Context, bitmap: Bitmap, fileName: String): Boolean {
+    return try {
+        Log.d("ProductCard", "Saving bitmap with name: $fileName")
+        val contentValues = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+            put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
+            put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+        }
 
-    if (uri == null) {
-        Log.e("ProductCard", "Failed to create new MediaStore record.")
-        return
-    }
+        val resolver = context.contentResolver
+        val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
 
-    uri?.let {
-        val outputStream: OutputStream? = resolver.openOutputStream(it)
+        if (uri == null) {
+            Log.e("ProductCard", "Failed to create new MediaStore record.")
+            return false
+        }
+
+        val outputStream: OutputStream? = resolver.openOutputStream(uri)
         if (outputStream == null) {
             Log.e("ProductCard", "Failed to get output stream.")
-            return
+            return false
         }
-        outputStream?.use { stream ->
+        
+        outputStream.use { stream ->
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
             Log.d("ProductCard", "Bitmap saved successfully.")
         }
+        true
+    } catch (e: Exception) {
+        Log.e("ProductCard", "Error saving bitmap", e)
+        false
     }
 }
