@@ -23,6 +23,8 @@ class SaleViewModel(private val saleDao: SaleDao) : ViewModel() {
     fun delete(sale: Sale) = viewModelScope.launch {
         saleDao.delete(sale)
     }
+
+    suspend fun getSaleById(id: Int): Sale? = saleDao.getSaleById(id)
 }
 
 class SaleViewModelFactory(private val saleDao: SaleDao) : ViewModelProvider.Factory {

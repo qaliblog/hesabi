@@ -18,4 +18,7 @@ interface SaleDao {
 
     @androidx.room.Delete
     suspend fun delete(sale: Sale)
+
+    @Query("SELECT * FROM sales WHERE id = :id LIMIT 1")
+    suspend fun getSaleById(id: Int): Sale?
 }

@@ -114,10 +114,22 @@ fun NavGraph() {
             composable(Screen.Sales.route) { SalesScreen(navController, saleViewModel) }
             composable(Screen.Purchases.route) { PurchasesScreen(navController, purchaseViewModel) }
             composable(Screen.Wallet.route) { WalletScreen(navController, walletTransactionViewModel) }
-            composable(Screen.AddProduct.route) { AddProductScreen(navController, productViewModel) }
-            composable(Screen.AddSale.route) { AddSaleScreen(navController, productViewModel, saleViewModel) }
-            composable(Screen.AddPurchase.route) { AddPurchaseScreen(navController, productViewModel, purchaseViewModel) }
-            composable(Screen.AddWalletTransaction.route) { AddWalletTransactionScreen(navController, walletTransactionViewModel) }
+            composable(Screen.AddProduct.route + "/{productId}") { backStackEntry ->
+                val productId = backStackEntry.arguments?.getString("productId")?.toIntOrNull()
+                AddProductScreen(navController, productViewModel, productId)
+            }
+            composable(Screen.AddSale.route + "/{saleId}") { backStackEntry ->
+                val saleId = backStackEntry.arguments?.getString("saleId")?.toIntOrNull()
+                AddSaleScreen(navController, productViewModel, saleViewModel, saleId)
+            }
+            composable(Screen.AddPurchase.route + "/{purchaseId}") { backStackEntry ->
+                val purchaseId = backStackEntry.arguments?.getString("purchaseId")?.toIntOrNull()
+                AddPurchaseScreen(navController, productViewModel, purchaseViewModel, purchaseId)
+            }
+            composable(Screen.AddWalletTransaction.route + "/{transactionId}") { backStackEntry ->
+                val transactionId = backStackEntry.arguments?.getString("transactionId")?.toIntOrNull()
+                AddWalletTransactionScreen(navController, walletTransactionViewModel, transactionId)
+            }
         }
     }
 }

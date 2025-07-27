@@ -18,4 +18,7 @@ interface WalletTransactionDao {
 
     @androidx.room.Delete
     suspend fun delete(transaction: WalletTransaction)
+
+    @Query("SELECT * FROM wallet_transactions WHERE id = :id LIMIT 1")
+    suspend fun getTransactionById(id: Int): WalletTransaction?
 }

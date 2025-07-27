@@ -21,6 +21,8 @@ class PurchaseViewModel(private val purchaseDao: PurchaseDao) : ViewModel() {
     fun delete(purchase: Purchase) = viewModelScope.launch {
         purchaseDao.delete(purchase)
     }
+
+    suspend fun getPurchaseById(id: Int): Purchase? = purchaseDao.getPurchaseById(id)
 }
 
 class PurchaseViewModelFactory(private val purchaseDao: PurchaseDao) : ViewModelProvider.Factory {
