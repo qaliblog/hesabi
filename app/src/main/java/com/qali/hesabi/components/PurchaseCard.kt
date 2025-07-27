@@ -42,9 +42,15 @@ import androidx.compose.ui.platform.LocalContext
 import com.qali.hesabi.util.ReceiptUtils
 import kotlinx.coroutines.launch
 import android.widget.Toast
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Delete
 
 @Composable
-fun PurchaseCard(purchase: Purchase) {
+fun PurchaseCard(
+    purchase: Purchase,
+    onEdit: (Purchase) -> Unit = {},
+    onDelete: (Purchase) -> Unit = {}
+) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
@@ -107,6 +113,20 @@ fun PurchaseCard(purchase: Purchase) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
+                    IconButton(onClick = { onEdit(purchase) }) {
+                        Icon(
+                            imageVector = androidx.compose.material.icons.Icons.Default.Edit,
+                            contentDescription = "Edit Purchase",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    IconButton(onClick = { onDelete(purchase) }) {
+                        Icon(
+                            imageVector = androidx.compose.material.icons.Icons.Default.Delete,
+                            contentDescription = "Delete Purchase",
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                    }
                     IconButton(
                         onClick = {
                             coroutineScope.launch {

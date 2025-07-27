@@ -48,16 +48,30 @@ import com.qali.hesabi.ui.PurchaseViewModel
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
 import com.qali.hesabi.data.PurchaseItem
+import androidx.compose.runtime.LaunchedEffect
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddPurchaseScreen(navController: NavController, productViewModel: ProductViewModel, purchaseViewModel: PurchaseViewModel) {
+fun AddPurchaseScreen(navController: NavController, productViewModel: ProductViewModel, purchaseViewModel: PurchaseViewModel, purchaseId: Int? = null) {
     var selectedProduct by remember { mutableStateOf<Product?>(null) }
     var quantity by remember { mutableStateOf("") }
     var price by remember { mutableStateOf("") }
     var showProductDialog by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
     var purchaseItems by remember { mutableStateOf(listOf<PurchaseItem>()) }
+    var isEdit by remember { mutableStateOf(false) }
+
+    LaunchedEffect(purchaseId) {
+        if (purchaseId != null) {
+            val purchase = withContext(Dispatchers.IO) { purchaseViewModel.getPurchaseById(purchaseId) }
+            purchase?.let {
+                purchaseItems = it.items
+                isEdit = true
+            }
+        }
+    }
     
     val products by productViewModel.allProducts.collectAsState(initial = emptyList())
     val filteredProducts = products.filter { 
@@ -86,7 +100,7 @@ fun AddPurchaseScreen(navController: NavController, productViewModel: ProductVie
             .padding(24.dp),
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "افزودن خرید جدید", style = MaterialTheme.typography.headlineSmall)
+        Text(text = if (isEdit) "ویرایش خرید" else "افزودن خرید جدید", style = MaterialTheme.typography.headlineSmall)
         Spacer(modifier = Modifier.height(24.dp))
         
         // Product selection row
@@ -166,9 +180,23 @@ fun AddPurchaseScreen(navController: NavController, productViewModel: ProductVie
         Button(
             onClick = {
                 if (purchaseItems.isNotEmpty()) {
-                    val total = purchaseItems.sumOf { it.price * it.quantity }
                     coroutineScope.launch {
-                        purchaseViewModel.insert(Purchase(total = total, items = purchaseItems))
+                        if (isEdit && purchaseId != null) {
+                            purchaseViewModel.update(
+                                Purchase(
+                                    id = purchaseId,
+                                    total = purchaseItems.sumOf { it.price * it.quantity },
+                                    items = purchaseItems
+                                )
+                            )
+                        } else {
+                            purchaseViewModel.insert(
+                                Purchase(
+                                    total = purchaseItems.sumOf { it.price * it.quantity },
+                                    items = purchaseItems
+                                )
+                            )
+                        }
                         navController.popBackStack()
                     }
                 }

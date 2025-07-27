@@ -64,7 +64,11 @@ fun ProductsScreen(navController: NavController, productViewModel: ProductViewMo
             modifier = Modifier.weight(1f)
         ) {
             items(products) { product ->
-                ProductCard(product = product)
+                ProductCard(
+                    product = product,
+                    onEdit = { navController.navigate(Screen.AddProduct.route + "/${product.id}") },
+                    onDelete = { productViewModel.delete(it) }
+                )
             }
         }
         Spacer(modifier = Modifier.height(24.dp))

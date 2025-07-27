@@ -28,12 +28,28 @@ import com.qali.hesabi.data.TransactionType
 import com.qali.hesabi.ui.WalletTransactionViewModel
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
+import androidx.compose.runtime.LaunchedEffect
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Composable
-fun AddWalletTransactionScreen(navController: NavController, walletTransactionViewModel: WalletTransactionViewModel) {
+fun AddWalletTransactionScreen(navController: NavController, walletTransactionViewModel: WalletTransactionViewModel, transactionId: Int? = null) {
     var amount by remember { mutableStateOf("") }
     var type by remember { mutableStateOf(0) } // 0: INCOME, 1: EXPENSE
     var description by remember { mutableStateOf("") }
+    var isEdit by remember { mutableStateOf(false) }
+
+    LaunchedEffect(transactionId) {
+        if (transactionId != null) {
+            val transaction = withContext(Dispatchers.IO) { walletTransactionViewModel.getTransactionById(transactionId) }
+            transaction?.let {
+                amount = it.amount.toInt().toString()
+                type = if (it.type == TransactionType.INCOME) 0 else 1
+                description = it.description
+                isEdit = true
+            }
+        }
+    }
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -43,7 +59,7 @@ fun AddWalletTransactionScreen(navController: NavController, walletTransactionVi
             .padding(24.dp),
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "افزودن تراکنش جدید", style = MaterialTheme.typography.headlineSmall)
+        Text(text = if (isEdit) "ویرایش تراکنش" else "افزودن تراکنش جدید", style = MaterialTheme.typography.headlineSmall)
         Spacer(modifier = Modifier.height(24.dp))
         OutlinedTextField(
             value = amount,
@@ -78,13 +94,24 @@ fun AddWalletTransactionScreen(navController: NavController, walletTransactionVi
                 val amt = amount.toDoubleOrNull() ?: 0.0
                 if (amt > 0.0 && description.isNotBlank()) {
                     coroutineScope.launch {
-                        walletTransactionViewModel.insert(
-                            WalletTransaction(
-                                amount = amt,
-                                type = if (type == 0) TransactionType.INCOME else TransactionType.EXPENSE,
-                                description = description
+                        if (isEdit && transactionId != null) {
+                            walletTransactionViewModel.update(
+                                WalletTransaction(
+                                    id = transactionId,
+                                    amount = amt,
+                                    type = if (type == 0) TransactionType.INCOME else TransactionType.EXPENSE,
+                                    description = description
+                                )
                             )
-                        )
+                        } else {
+                            walletTransactionViewModel.insert(
+                                WalletTransaction(
+                                    amount = amt,
+                                    type = if (type == 0) TransactionType.INCOME else TransactionType.EXPENSE,
+                                    description = description
+                                )
+                            )
+                        }
                         navController.popBackStack()
                     }
                 }

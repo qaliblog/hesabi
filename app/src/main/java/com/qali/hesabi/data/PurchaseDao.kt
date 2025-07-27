@@ -12,4 +12,13 @@ interface PurchaseDao {
 
     @Insert
     suspend fun insert(purchase: Purchase)
+
+    @androidx.room.Update
+    suspend fun update(purchase: Purchase)
+
+    @androidx.room.Delete
+    suspend fun delete(purchase: Purchase)
+
+    @Query("SELECT * FROM purchases WHERE id = :id LIMIT 1")
+    suspend fun getPurchaseById(id: Int): Purchase?
 }

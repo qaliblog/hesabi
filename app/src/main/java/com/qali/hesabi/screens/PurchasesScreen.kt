@@ -77,7 +77,11 @@ fun PurchasesScreen(navController: NavController, purchaseViewModel: PurchaseVie
                 modifier = Modifier.weight(1f)
             ) {
                 items(purchases) { purchase ->
-                    PurchaseCard(purchase = purchase)
+                    PurchaseCard(
+                        purchase = purchase,
+                        onEdit = { navController.navigate(Screen.AddPurchase.route + "/${purchase.id}") },
+                        onDelete = { purchaseViewModel.delete(it) }
+                    )
                 }
             }
         }

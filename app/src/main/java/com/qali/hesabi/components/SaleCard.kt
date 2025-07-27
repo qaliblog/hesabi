@@ -49,9 +49,15 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.Color as ComposeColor
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Delete
 
 @Composable
-fun SaleCard(sale: Sale) {
+fun SaleCard(
+    sale: Sale,
+    onEdit: (Sale) -> Unit = {},
+    onDelete: (Sale) -> Unit = {}
+) {
     val dateFormat = SimpleDateFormat("yyyy/MM/dd HH:mm", Locale("fa"))
     val dateString = dateFormat.format(Date(sale.date))
     val context = LocalContext.current
@@ -148,6 +154,20 @@ fun SaleCard(sale: Sale) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
+                    IconButton(onClick = { onEdit(sale) }) {
+                        Icon(
+                            imageVector = androidx.compose.material.icons.Icons.Default.Edit,
+                            contentDescription = "Edit Sale",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    IconButton(onClick = { onDelete(sale) }) {
+                        Icon(
+                            imageVector = androidx.compose.material.icons.Icons.Default.Delete,
+                            contentDescription = "Delete Sale",
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                    }
                     IconButton(onClick = {
                         coroutineScope.launch {
                             val bitmap = generateReceiptBitmapStyled(sale, dateString)

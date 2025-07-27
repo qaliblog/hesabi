@@ -50,16 +50,31 @@ import com.qali.hesabi.ui.ProductViewModel
 import com.qali.hesabi.ui.SaleViewModel
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
+import androidx.compose.runtime.LaunchedEffect
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddSaleScreen(navController: NavController, productViewModel: ProductViewModel, saleViewModel: SaleViewModel) {
+fun AddSaleScreen(navController: NavController, productViewModel: ProductViewModel, saleViewModel: SaleViewModel, saleId: Int? = null) {
     var buyerName by remember { mutableStateOf("") }
     var selectedProducts by remember { mutableStateOf<List<SaleItem>>(emptyList()) }
     var showProductDialog by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
     var currentQuantity by remember { mutableStateOf("1") }
     var currentPrice by remember { mutableStateOf("") }
+    var isEdit by remember { mutableStateOf(false) }
+
+    LaunchedEffect(saleId) {
+        if (saleId != null) {
+            val sale = withContext(Dispatchers.IO) { saleViewModel.getSaleById(saleId) }
+            sale?.let {
+                buyerName = it.buyerName
+                selectedProducts = it.products
+                isEdit = true
+            }
+        }
+    }
     
     val products by productViewModel.allProducts.collectAsState(initial = emptyList())
     val filteredProducts = products.filter { 
@@ -95,7 +110,7 @@ fun AddSaleScreen(navController: NavController, productViewModel: ProductViewMod
             .padding(24.dp),
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "افزودن فروش جدید", style = MaterialTheme.typography.headlineSmall)
+        Text(text = if (isEdit) "ویرایش فروش" else "افزودن فروش جدید", style = MaterialTheme.typography.headlineSmall)
         Spacer(modifier = Modifier.height(24.dp))
         
         OutlinedTextField(
@@ -225,20 +240,31 @@ fun AddSaleScreen(navController: NavController, productViewModel: ProductViewMod
         
         Button(
             onClick = {
-                if (buyerName.isNotEmpty() && selectedProducts.isNotEmpty()) {
+                if (buyerName.isNotBlank() && selectedProducts.isNotEmpty()) {
                     coroutineScope.launch {
-                        val sale = Sale(
-                            buyerName = buyerName,
-                            total = total,
-                            products = selectedProducts
-                        )
-                        saleViewModel.insert(sale)
+                        if (isEdit && saleId != null) {
+                            saleViewModel.update(
+                                Sale(
+                                    id = saleId,
+                                    buyerName = buyerName,
+                                    total = total,
+                                    products = selectedProducts
+                                )
+                            )
+                        } else {
+                            saleViewModel.insert(
+                                Sale(
+                                    buyerName = buyerName,
+                                    total = total,
+                                    products = selectedProducts
+                                )
+                            )
+                        }
                         navController.popBackStack()
                     }
                 }
             },
-            modifier = Modifier.align(Alignment.End),
-            enabled = buyerName.isNotEmpty() && selectedProducts.isNotEmpty()
+            modifier = Modifier.align(Alignment.End)
         ) {
             Text("ذخیره فروش")
         }

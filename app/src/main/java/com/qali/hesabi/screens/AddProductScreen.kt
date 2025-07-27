@@ -36,13 +36,30 @@ import com.qali.hesabi.data.Product
 import com.qali.hesabi.ui.ProductViewModel
 import com.qali.hesabi.util.toEnglishNumbers
 import kotlinx.coroutines.launch
+import androidx.compose.runtime.LaunchedEffect
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Composable
-fun AddProductScreen(navController: NavController, productViewModel: ProductViewModel) {
+fun AddProductScreen(navController: NavController, productViewModel: ProductViewModel, productId: Int? = null) {
     var name by remember { mutableStateOf("") }
     var price by remember { mutableStateOf(0.0) }
     var quantity by remember { mutableStateOf(0) }
     var barcode by remember { mutableStateOf("") }
+    var isEdit by remember { mutableStateOf(false) }
+
+    LaunchedEffect(productId) {
+        if (productId != null) {
+            val product = withContext(Dispatchers.IO) { productViewModel.getProductById(productId) }
+            product?.let {
+                name = it.name
+                price = it.price
+                quantity = it.quantity
+                barcode = it.barcode
+                isEdit = true
+            }
+        }
+    }
 
     val scannerLauncher = rememberLauncherForActivityResult(
         contract = ScanContract(),
@@ -59,7 +76,7 @@ fun AddProductScreen(navController: NavController, productViewModel: ProductView
             .padding(24.dp),
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "افزودن محصول جدید", style = MaterialTheme.typography.headlineSmall)
+        Text(text = if (isEdit) "ویرایش محصول" else "افزودن محصول جدید", style = MaterialTheme.typography.headlineSmall)
         Spacer(modifier = Modifier.height(24.dp))
         OutlinedTextField(
             value = name,
@@ -114,17 +131,29 @@ fun AddProductScreen(navController: NavController, productViewModel: ProductView
         Spacer(modifier = Modifier.height(24.dp))
         Button(
             onClick = {
-                coroutineScope.launch {
-                    productViewModel.insert(
-                        Product(
-                            name = name,
-                            price = price,
-                            quantity = quantity,
-                            barcode = barcode
+                if (name.isNotBlank() && price > 0.0 && quantity > 0) {
+                    if (isEdit && productId != null) {
+                        productViewModel.update(
+                            Product(
+                                id = productId,
+                                name = name,
+                                price = price,
+                                quantity = quantity,
+                                barcode = barcode
+                            )
                         )
-                    )
+                    } else {
+                        productViewModel.insert(
+                            Product(
+                                name = name,
+                                price = price,
+                                quantity = quantity,
+                                barcode = barcode
+                            )
+                        )
+                    }
+                    navController.popBackStack()
                 }
-                navController.popBackStack()
             },
             modifier = Modifier.align(Alignment.End)
         ) {

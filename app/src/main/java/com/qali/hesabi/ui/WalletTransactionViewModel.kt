@@ -13,6 +13,16 @@ class WalletTransactionViewModel(private val dao: WalletTransactionDao) : ViewMo
     fun insert(transaction: WalletTransaction) = viewModelScope.launch {
         dao.insert(transaction)
     }
+
+    fun update(transaction: WalletTransaction) = viewModelScope.launch {
+        dao.update(transaction)
+    }
+
+    fun delete(transaction: WalletTransaction) = viewModelScope.launch {
+        dao.delete(transaction)
+    }
+
+    suspend fun getTransactionById(id: Int): WalletTransaction? = dao.getTransactionById(id)
 }
 
 class WalletTransactionViewModelFactory(private val dao: WalletTransactionDao) : ViewModelProvider.Factory {

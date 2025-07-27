@@ -76,7 +76,11 @@ fun SalesScreen(navController: NavController, saleViewModel: SaleViewModel) {
                 modifier = Modifier.weight(1f)
             ) {
                 items(sales) { sale ->
-                    SaleCard(sale = sale)
+                    SaleCard(
+                        sale = sale,
+                        onEdit = { navController.navigate(Screen.AddSale.route + "/${sale.id}") },
+                        onDelete = { saleViewModel.delete(it) }
+                    )
                 }
             }
         }
