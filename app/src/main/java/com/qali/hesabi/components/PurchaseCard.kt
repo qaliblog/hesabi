@@ -42,6 +42,8 @@ import androidx.compose.ui.platform.LocalContext
 import com.qali.hesabi.util.ReceiptUtils
 import kotlinx.coroutines.launch
 import android.widget.Toast
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Delete
 
 @Composable
 fun PurchaseCard(

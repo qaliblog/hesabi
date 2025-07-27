@@ -49,6 +49,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.Color as ComposeColor
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Delete
 
 @Composable
 fun SaleCard(
