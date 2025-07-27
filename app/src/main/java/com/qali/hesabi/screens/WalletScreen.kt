@@ -93,7 +93,11 @@ fun WalletScreen(navController: NavController, walletTransactionViewModel: Walle
                 modifier = Modifier.weight(1f)
             ) {
                 items(transactions) { transaction ->
-                    WalletCard(transaction = transaction)
+                    WalletCard(
+                        transaction = transaction,
+                        onEdit = { navController.navigate(Screen.AddWalletTransaction.route + "/${transaction.id}") },
+                        onDelete = { walletTransactionViewModel.delete(it) }
+                    )
                 }
             }
         }

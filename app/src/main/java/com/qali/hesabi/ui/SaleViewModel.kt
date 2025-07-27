@@ -15,6 +15,14 @@ class SaleViewModel(private val saleDao: SaleDao) : ViewModel() {
     fun insert(sale: Sale) = viewModelScope.launch {
         saleDao.insert(sale)
     }
+
+    fun update(sale: Sale) = viewModelScope.launch {
+        saleDao.update(sale)
+    }
+
+    fun delete(sale: Sale) = viewModelScope.launch {
+        saleDao.delete(sale)
+    }
 }
 
 class SaleViewModelFactory(private val saleDao: SaleDao) : ViewModelProvider.Factory {

@@ -15,6 +15,14 @@ class ProductViewModel(private val productDao: ProductDao) : ViewModel() {
     fun insert(product: Product) = viewModelScope.launch {
         productDao.insert(product)
     }
+
+    fun update(product: Product) = viewModelScope.launch {
+        productDao.update(product)
+    }
+
+    fun delete(product: Product) = viewModelScope.launch {
+        productDao.delete(product)
+    }
 }
 
 class ProductViewModelFactory(private val productDao: ProductDao) : ViewModelProvider.Factory {

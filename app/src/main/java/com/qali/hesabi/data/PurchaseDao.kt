@@ -12,4 +12,10 @@ interface PurchaseDao {
 
     @Insert
     suspend fun insert(purchase: Purchase)
+
+    @androidx.room.Update
+    suspend fun update(purchase: Purchase)
+
+    @androidx.room.Delete
+    suspend fun delete(purchase: Purchase)
 }

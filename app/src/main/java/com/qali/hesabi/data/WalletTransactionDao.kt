@@ -12,4 +12,10 @@ interface WalletTransactionDao {
 
     @Insert
     suspend fun insert(transaction: WalletTransaction)
+
+    @androidx.room.Update
+    suspend fun update(transaction: WalletTransaction)
+
+    @androidx.room.Delete
+    suspend fun delete(transaction: WalletTransaction)
 }

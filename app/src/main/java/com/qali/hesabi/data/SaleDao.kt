@@ -12,4 +12,10 @@ interface SaleDao {
 
     @Insert
     suspend fun insert(sale: Sale)
+
+    @androidx.room.Update
+    suspend fun update(sale: Sale)
+
+    @androidx.room.Delete
+    suspend fun delete(sale: Sale)
 }

@@ -13,6 +13,14 @@ class PurchaseViewModel(private val purchaseDao: PurchaseDao) : ViewModel() {
     fun insert(purchase: Purchase) = viewModelScope.launch {
         purchaseDao.insert(purchase)
     }
+
+    fun update(purchase: Purchase) = viewModelScope.launch {
+        purchaseDao.update(purchase)
+    }
+
+    fun delete(purchase: Purchase) = viewModelScope.launch {
+        purchaseDao.delete(purchase)
+    }
 }
 
 class PurchaseViewModelFactory(private val purchaseDao: PurchaseDao) : ViewModelProvider.Factory {

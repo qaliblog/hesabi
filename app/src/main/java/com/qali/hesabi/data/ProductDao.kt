@@ -10,6 +10,12 @@ interface ProductDao {
     @Insert
     suspend fun insert(product: Product)
 
+    @androidx.room.Update
+    suspend fun update(product: Product)
+
+    @androidx.room.Delete
+    suspend fun delete(product: Product)
+
     @Query("SELECT * FROM products")
     fun getAllProducts(): Flow<List<Product>>
 }

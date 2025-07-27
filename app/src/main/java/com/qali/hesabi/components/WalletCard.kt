@@ -22,9 +22,18 @@ import com.qali.hesabi.data.WalletTransaction
 import androidx.compose.ui.unit.dp
 
 import androidx.compose.foundation.border
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 
 @Composable
-fun WalletCard(transaction: WalletTransaction) {
+fun WalletCard(
+    transaction: WalletTransaction,
+    onEdit: (WalletTransaction) -> Unit = {},
+    onDelete: (WalletTransaction) -> Unit = {}
+) {
     val color = when (transaction.type) {
         TransactionType.INCOME -> Color(0xFF43A047)
         TransactionType.EXPENSE -> Color(0xFFD32F2F)
@@ -50,6 +59,22 @@ fun WalletCard(transaction: WalletTransaction) {
                 Text(text = if (transaction.type == TransactionType.INCOME) "درآمد" else "هزینه", color = color)
             }
             Text(text = "${transaction.amount} تومان", color = color, style = MaterialTheme.typography.titleLarge)
+            Row {
+                IconButton(onClick = { onEdit(transaction) }) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Edit Transaction",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+                IconButton(onClick = { onDelete(transaction) }) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete Transaction",
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
         }
     }
 }

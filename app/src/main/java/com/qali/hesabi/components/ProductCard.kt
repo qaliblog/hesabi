@@ -55,7 +55,11 @@ import androidx.compose.foundation.border
 import androidx.compose.ui.graphics.Brush
 
 @Composable
-fun ProductCard(product: Product) {
+fun ProductCard(
+    product: Product,
+    onEdit: (Product) -> Unit = {},
+    onDelete: (Product) -> Unit = {}
+) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val requestPermission = rememberRequestStoragePermission()
@@ -106,6 +110,22 @@ fun ProductCard(product: Product) {
                 Spacer(modifier = Modifier.width(16.dp))
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     BarcodeView(barcode = product.barcode)
+                    Row {
+                        IconButton(onClick = { onEdit(product) }) {
+                            Icon(
+                                imageVector = androidx.compose.material.icons.Icons.Default.Edit,
+                                contentDescription = "Edit Product",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                        IconButton(onClick = { onDelete(product) }) {
+                            Icon(
+                                imageVector = androidx.compose.material.icons.Icons.Default.Delete,
+                                contentDescription = "Delete Product",
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
                     IconButton(
                         onClick = {
                             coroutineScope.launch {
