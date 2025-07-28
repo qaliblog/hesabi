@@ -43,6 +43,7 @@ import com.qali.hesabi.data.Sale
 import com.qali.hesabi.data.Purchase
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.foundation.layout.width
 
 @Composable
 fun ProductsScreen(
