@@ -66,6 +66,71 @@ import android.os.CancellationSignal
 import android.os.ParcelFileDescriptor
 import java.io.FileOutputStream
 import android.print.PageRange
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.PathBuilder
+import androidx.compose.ui.graphics.vector.addPath
+import androidx.compose.ui.graphics.Color
+
+val CustomPrintIcon = ImageVector.Builder(
+    name = "CustomPrint", defaultWidth = 24f, defaultHeight = 24f, viewportWidth = 24f, viewportHeight = 24f
+).apply {
+    addPath(
+        pathData = PathBuilder().apply {
+            moveTo(6f, 9f)
+            lineTo(18f, 9f)
+            lineTo(18f, 4f)
+            lineTo(6f, 4f)
+            close()
+            moveTo(19f, 8f)
+            horizontalLineTo(20f)
+            arcToRelative(1f, 1f, 0f, false, true, 1f, 1f)
+            verticalLineTo(19f)
+            arcToRelative(1f, 1f, 0f, false, true, -1f, 1f)
+            horizontalLineTo(5f)
+            arcToRelative(1f, 1f, 0f, false, true, -1f, -1f)
+            verticalLineTo(9f)
+            arcToRelative(1f, 1f, 0f, false, true, 1f, -1f)
+            horizontalLineTo(6f)
+            verticalLineTo(2f)
+            horizontalLineTo(18f)
+            verticalLineTo(8f)
+            close()
+        }.getNodes(),
+        fill = Color.Black
+    )
+}.build()
+
+val CustomShareIcon = ImageVector.Builder(
+    name = "CustomShare", defaultWidth = 24f, defaultHeight = 24f, viewportWidth = 24f, viewportHeight = 24f
+).apply {
+    addPath(
+        pathData = PathBuilder().apply {
+            moveTo(18f, 16.08f)
+            curveTo(17.24f, 16.08f, 16.56f, 16.38f, 16.05f, 16.85f)
+            lineTo(8.91f, 12.7f)
+            curveTo(8.96f, 12.47f, 9f, 12.24f, 9f, 12f)
+            curveTo(9f, 11.76f, 8.96f, 11.53f, 8.91f, 11.3f)
+            lineTo(15.96f, 7.19f)
+            curveTo(16.5f, 7.69f, 17.21f, 8f, 18f, 8f)
+            curveTo(19.66f, 8f, 21f, 6.66f, 21f, 5f)
+            curveTo(21f, 3.34f, 19.66f, 2f, 18f, 2f)
+            curveTo(16.34f, 2f, 15f, 3.34f, 15f, 5f)
+            curveTo(15f, 5.24f, 15.04f, 5.47f, 15.09f, 5.7f)
+            lineTo(8.04f, 9.81f)
+            curveTo(7.5f, 9.31f, 6.79f, 9f, 6f, 9f)
+            curveTo(4.34f, 9f, 3f, 10.34f, 3f, 12f)
+            curveTo(3f, 13.66f, 4.34f, 15f, 6f, 15f)
+            curveTo(6.79f, 15f, 7.5f, 14.69f, 8.04f, 14.19f)
+            lineTo(15.14f, 18.36f)
+            curveTo(15.09f, 18.56f, 15.06f, 18.78f, 15.06f, 19f)
+            curveTo(15.06f, 20.1f, 15.96f, 21f, 17.06f, 21f)
+            curveTo(18.16f, 21f, 19.06f, 20.1f, 19.06f, 19f)
+            curveTo(19.06f, 17.9f, 18.16f, 17f, 17.06f, 17f)
+            close()
+        }.getNodes(),
+        fill = Color.Black
+    )
+}.build()
 
 @Composable
 fun SaleCard(
@@ -202,7 +267,7 @@ fun SaleCard(
                             shareBitmap(context, bitmap, "sale-receipt-${sale.id}.png")
                         }
                     }) {
-                        Icon(Icons.Filled.Share, contentDescription = "اشتراک گذاری رسید", tint = ComposeColor(0xFF388E3C))
+                        Icon(CustomShareIcon, contentDescription = "اشتراک گذاری رسید", tint = ComposeColor(0xFF388E3C))
                     }
                     IconButton(onClick = {
                         coroutineScope.launch {
@@ -210,7 +275,7 @@ fun SaleCard(
                             printBitmap(context, bitmap, "رسید فروش")
                         }
                     }) {
-                        Icon(Icons.Filled.Print, contentDescription = "چاپ رسید", tint = ComposeColor(0xFF6D4C41))
+                        Icon(CustomPrintIcon, contentDescription = "چاپ رسید", tint = ComposeColor(0xFF6D4C41))
                     }
                 }
             }
