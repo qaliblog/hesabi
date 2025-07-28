@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.Box
 
 @Composable
 fun WalletScreen(navController: NavController, walletTransactionViewModel: WalletTransactionViewModel) {
@@ -134,7 +135,6 @@ fun WalletScreen(navController: NavController, walletTransactionViewModel: Walle
 
 @Composable
 fun DailyExpensesChart(transactions: List<com.qali.hesabi.data.WalletTransaction>) {
-    // Group by Jalali date string, sum expenses only
     val dailyTotals = transactions
         .filter { it.type == com.qali.hesabi.data.TransactionType.EXPENSE }
         .groupBy { com.qali.hesabi.util.JalaliUtils.toJalaliString(java.util.Date(it.date)) }
@@ -151,12 +151,19 @@ fun DailyExpensesChart(transactions: List<com.qali.hesabi.data.WalletTransaction
     val barWidth = 40f
     val barSpacing = 24f
     val chartHeight = 180f
+    val scrollState = rememberScrollState()
 
-    androidx.compose.foundation.horizontalScroll(rememberScrollState()) {
-        androidx.compose.foundation.Canvas(modifier = Modifier
+    Box(
+        Modifier
+            .horizontalScroll(scrollState)
             .fillMaxWidth()
-            .height(chartHeight.dp)
-            .padding(vertical = 8.dp)) {
+    ) {
+        Canvas(
+            modifier = Modifier
+                .height(chartHeight.dp)
+                .padding(vertical = 8.dp)
+                .width(((barWidth + barSpacing) * dailyTotals.size).dp)
+        ) {
             dailyTotals.forEachIndexed { idx, (date, amount) ->
                 val left = idx * (barWidth + barSpacing)
                 val barHeight = (amount / maxAmount * (size.height - 32f)).toFloat()
@@ -165,27 +172,31 @@ fun DailyExpensesChart(transactions: List<com.qali.hesabi.data.WalletTransaction
                     topLeft = Offset(left, size.height - barHeight),
                     size = androidx.compose.ui.geometry.Size(barWidth, barHeight)
                 )
-                drawContext.canvas.nativeCanvas.apply {
-                    drawText(
-                        date,
-                        left + barWidth / 2,
-                        size.height - 4f,
-                        android.graphics.Paint().apply {
-                            textAlign = android.graphics.Paint.Align.CENTER
-                            textSize = 24f
-                            color = android.graphics.Color.DKGRAY
-                        }
-                    )
-                    drawText(
+                // Draw amount above bar
+                drawContext.canvas.drawIntoCanvas { canvas ->
+                    val paint = android.graphics.Paint().apply {
+                        textAlign = android.graphics.Paint.Align.CENTER
+                        textSize = 28f
+                        color = android.graphics.Color.BLACK
+                        isFakeBoldText = true
+                    }
+                    canvas.nativeCanvas.drawText(
                         amount.toInt().toString(),
                         left + barWidth / 2,
                         size.height - barHeight - 8f,
-                        android.graphics.Paint().apply {
-                            textAlign = android.graphics.Paint.Align.CENTER
-                            textSize = 28f
-                            color = android.graphics.Color.BLACK
-                            isFakeBoldText = true
-                        }
+                        paint
+                    )
+                    // Draw date below bar
+                    val datePaint = android.graphics.Paint().apply {
+                        textAlign = android.graphics.Paint.Align.CENTER
+                        textSize = 24f
+                        color = android.graphics.Color.DKGRAY
+                    }
+                    canvas.nativeCanvas.drawText(
+                        date,
+                        left + barWidth / 2,
+                        size.height - 4f,
+                        datePaint
                     )
                 }
             }
