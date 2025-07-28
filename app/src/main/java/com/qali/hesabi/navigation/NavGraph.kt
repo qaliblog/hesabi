@@ -110,7 +110,7 @@ fun NavGraph() {
             startDestination = Screen.Products.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(Screen.Products.route) { ProductsScreen(navController, productViewModel) }
+            composable(Screen.Products.route) { ProductsScreen(navController, productViewModel, saleViewModel, purchaseViewModel) }
             composable(Screen.Sales.route) { SalesScreen(navController, saleViewModel) }
             composable(Screen.Purchases.route) { PurchasesScreen(navController, purchaseViewModel) }
             composable(Screen.Wallet.route) { WalletScreen(navController, walletTransactionViewModel) }
