@@ -42,7 +42,6 @@ import com.qali.hesabi.data.Product
 import com.qali.hesabi.data.Sale
 import com.qali.hesabi.data.Purchase
 import androidx.compose.foundation.layout.Row
-import androidx.compose.ui.unit.width
 import androidx.compose.material.icons.filled.ArrowDropDown
 
 @Composable
