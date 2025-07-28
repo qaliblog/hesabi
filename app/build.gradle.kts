@@ -79,5 +79,6 @@ dependencies {
     
     // Gson for JSON serialization
     implementation("com.google.code.gson:gson:2.10.1")
-    implementation("com.github.samanzamani.persiandate:PersianDate:0.8.4")
+    // implementation("com.github.samanzamani.persiandate:PersianDate:0.8.4") // Remove unavailable library
+    implementation("com.github.mohammadatif:jalali-calendar:1.1.0")
 }
