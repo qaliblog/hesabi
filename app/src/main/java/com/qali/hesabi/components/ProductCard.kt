@@ -288,6 +288,7 @@ private fun shareBitmap(context: android.content.Context, bitmap: Bitmap, fileNa
 }
 private fun printBitmap(context: android.content.Context, bitmap: Bitmap, jobName: String) {
     val printManager = context.getSystemService(android.content.Context.PRINT_SERVICE) as PrintManager
+    var printAttrs: PrintAttributes? = null
     val printAdapter = object : PrintDocumentAdapter() {
         override fun onLayout(
             oldAttributes: PrintAttributes?,
@@ -296,6 +297,7 @@ private fun printBitmap(context: android.content.Context, bitmap: Bitmap, jobNam
             callback: LayoutResultCallback?,
             extras: android.os.Bundle?
         ) {
+            printAttrs = newAttributes
             if (cancellationSignal?.isCanceled == true) {
                 callback?.onLayoutCancelled()
                 return
@@ -309,7 +311,7 @@ private fun printBitmap(context: android.content.Context, bitmap: Bitmap, jobNam
             cancellationSignal: CancellationSignal?,
             callback: WriteResultCallback?
         ) {
-            val pdfDocument = PrintedPdfDocument(context, PrintAttributes.Builder().build())
+            val pdfDocument = PrintedPdfDocument(context, printAttrs!!)
             val page = pdfDocument.startPage(0)
             val canvas = page.canvas
             canvas.drawBitmap(bitmap, 0f, 0f, null)
