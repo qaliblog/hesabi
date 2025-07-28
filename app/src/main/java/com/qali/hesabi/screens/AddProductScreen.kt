@@ -40,7 +40,7 @@ import androidx.compose.runtime.LaunchedEffect
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import android.util.Log
-import androidx.compose.ui.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveable
 
 // State holder for form data
 data class ProductFormState(
@@ -158,7 +158,7 @@ fun AddProductScreen(navController: NavController, productViewModel: ProductView
                 Icon(Icons.Filled.Camera, contentDescription = "اسکن بارکد")
             }
             IconButton(onClick = {
-                val randomBarcode = (1..13).map { (0..9).random() }.joinToString("")
+                val randomBarcode = (1..13).map { _ -> (0..9).random() }.joinToString("")
                 formState = formState.copy(barcode = randomBarcode)
             }) {
                 Icon(Icons.Filled.QrCodeScanner, contentDescription = "تولید بارکد تصادفی")
