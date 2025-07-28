@@ -44,9 +44,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
-import com.patrykandpatrick.vico.compose.chart.line.lineChart
-import com.patrykandpatrick.vico.compose.axis.horizontal.rememberHorizontalAxis
-import com.patrykandpatrick.vico.compose.axis.vertical.rememberVerticalAxis
+import com.patrykandpatrick.vico.compose.chart.line.LineChart
+import com.patrykandpatrick.vico.compose.axis.rememberAxis
 import com.patrykandpatrick.vico.core.entry.entryModelOf
 import com.patrykandpatrick.vico.core.entry.FloatEntry
 import com.patrykandpatrick.vico.compose.component.shape.ShapeComponent
@@ -210,19 +209,18 @@ fun LineChartVico(transactions: List<com.qali.hesabi.data.WalletTransaction>, gr
     val entries = netByGroup.mapIndexed { idx, pair -> FloatEntry(idx.toFloat(), pair.second.toFloat()) }
     val labels = netByGroup.map { it.first }
     val entryModel = entryModelOf(entries)
-    val horizontalAxis = rememberHorizontalAxis(
+    val horizontalAxis = rememberAxis(
         valueFormatter = { value, _ ->
             val i = value.toInt()
             if (i in labels.indices) labels[i] else ""
         },
         labelRotationDegrees = 90f
     )
-    val verticalAxis = rememberVerticalAxis()
+    val verticalAxis = rememberAxis()
     Column(Modifier.fillMaxWidth()) {
         Box(Modifier.height(220.dp).fillMaxWidth()) {
-            lineChart(
-                chart = com.patrykandpatrick.vico.core.chart.line.LineChart(),
-                model = entryModel,
+            LineChart(
+                entryModel = entryModel,
                 startAxis = verticalAxis,
                 bottomAxis = horizontalAxis,
                 modifier = Modifier.fillMaxSize()
