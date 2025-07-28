@@ -44,6 +44,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
+import com.patrykandpatrick.vico.compose.chart.line.LineChart
+import com.patrykandpatrick.vico.compose.axis.horizontal.rememberAxis
+import com.patrykandpatrick.vico.compose.axis.vertical.rememberAxis as rememberVerticalAxis
+import com.patrykandpatrick.vico.compose.axis.horizontal.rememberAxis as rememberHorizontalAxis
+import com.patrykandpatrick.vico.core.entry.ChartEntry
+import com.patrykandpatrick.vico.core.entry.entryModelOf
+import com.patrykandpatrick.vico.core.entry.FloatEntry
+import com.patrykandpatrick.vico.compose.component.shape.ShapeComponent
+import com.patrykandpatrick.vico.compose.component.shape.Shapes
+import com.patrykandpatrick.vico.compose.component.textComponent
+import com.patrykandpatrick.vico.core.axis.Axis
+import androidx.compose.ui.graphics.toArgb
 
 @Composable
 fun WalletScreen(navController: NavController, walletTransactionViewModel: WalletTransactionViewModel) {
@@ -167,15 +179,15 @@ fun DailyExpensesChart(transactions: List<com.qali.hesabi.data.WalletTransaction
         }
         Spacer(Modifier.height(8.dp))
         if (chartMode == "روزانه") {
-            LineChart(transactions, groupByMonth = false)
+            LineChartVico(transactions, groupByMonth = false)
         } else {
-            LineChart(transactions, groupByMonth = true)
+            LineChartVico(transactions, groupByMonth = true)
         }
     }
 }
 
 @Composable
-fun LineChart(transactions: List<com.qali.hesabi.data.WalletTransaction>, groupByMonth: Boolean) {
+fun LineChartVico(transactions: List<com.qali.hesabi.data.WalletTransaction>, groupByMonth: Boolean) {
     // Group by Jalali date (day or month)
     val grouped = transactions.groupBy {
         val date = java.util.Date(it.date)
@@ -196,70 +208,32 @@ fun LineChart(transactions: List<com.qali.hesabi.data.WalletTransaction>, groupB
         Text("هیچ داده‌ای برای نمایش وجود ندارد", style = androidx.compose.material3.MaterialTheme.typography.bodyMedium)
         return
     }
-    val maxNet = netByGroup.maxOf { it.second }
-    val minNet = netByGroup.minOf { it.second }
-    val chartHeight = 180.dp
-    val chartWidth = (netByGroup.size * 60).dp.coerceAtLeast(300.dp)
-    val scrollState = rememberScrollState()
-    Box(
-        Modifier
-            .horizontalScroll(scrollState)
-            .fillMaxWidth()
-    ) {
-        Canvas(
-            modifier = Modifier
-                .height(chartHeight)
-                .width(chartWidth)
-        ) {
-            val points = netByGroup.mapIndexed { idx, pair ->
-                val x = idx * (size.width / (netByGroup.size - 1).coerceAtLeast(1))
-                val y = size.height - (((pair.second - minNet) / (maxNet - minNet + 1e-6)).toFloat() * size.height)
-                Offset(x.toFloat(), y.toFloat())
-            }
-            if (points.size > 1) {
-                for (i in 0 until points.size - 1) {
-                    drawLine(
-                        color = if (netByGroup[i + 1].second >= 0)
-                            Color(0xFF43A047)
-                        else
-                            Color(0xFFD32F2F),
-                        start = points[i],
-                        end = points[i + 1],
-                        strokeWidth = 4f
-                    )
-                }
-            }
-            // Draw points
-            points.forEachIndexed { idx, pt ->
-                drawCircle(
-                    color = if (netByGroup[idx].second >= 0)
-                        Color(0xFF43A047)
-                    else
-                        Color(0xFFD32F2F),
-                    radius = 7f,
-                    center = pt
-                )
-            }
-        }
-        // X axis labels
-        Row(
-            Modifier
-                .align(Alignment.BottomStart)
-                .padding(top = chartHeight + 4.dp)
-                .width(chartWidth),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            netByGroup.forEach { (date, _) ->
-                Text(
-                    text = if (groupByMonth)
-                        date.replace("/", "-")
-                    else
-                        date.substring(5),
-                    style = androidx.compose.material3.MaterialTheme.typography.labelSmall,
-                    color = Color.DarkGray,
-                    maxLines = 1
-                )
-            }
+    // Prepare chart entries and labels
+    val entries = netByGroup.mapIndexed { idx, pair -> FloatEntry(idx.toFloat(), pair.second.toFloat()) }
+    val labels = netByGroup.map { it.first }
+    val entryModel = entryModelOf(entries)
+    val labelComponent = textComponent {
+        color = Color.DarkGray.toArgb()
+        rotationDegrees = 90f // vertical
+    }
+    val axis = rememberAxis(
+        valueFormatter = { value, _ ->
+            val i = value.toInt()
+            if (i in labels.indices) labels[i] else ""
+        },
+        label = labelComponent,
+        guideline = null
+    )
+    val verticalAxis = rememberVerticalAxis(guideline = { Axis.GUIDELINE_AUTO })
+    Column(Modifier.fillMaxWidth()) {
+        Box(Modifier.height(220.dp).fillMaxWidth()) {
+            LineChart(
+                chart = com.patrykandpatrick.vico.core.chart.line.LineChart(),
+                model = entryModel,
+                startAxis = verticalAxis,
+                bottomAxis = axis,
+                modifier = Modifier.fillMaxSize()
+            )
         }
     }
 }

@@ -81,4 +81,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
     // implementation("com.github.samanzamani.persiandate:PersianDate:0.8.4") // Remove unavailable library
     implementation("com.github.eloyzone:jalali-calendar:1.0.0")
+    implementation("com.patrykandpatrick.vico:compose:1.13.0")
+    implementation("com.patrykandpatrick.vico:core:1.13.0")
+    implementation("com.patrykandpatrick.vico:compose-m3:1.13.0")
 }
