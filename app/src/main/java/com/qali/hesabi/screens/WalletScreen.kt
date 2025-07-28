@@ -196,7 +196,7 @@ fun MPLineChart(
 @Composable
 fun DailyExpensesChart(transactions: List<com.qali.hesabi.data.WalletTransaction>) {
     var chartMode by remember { mutableStateOf("روزانه") }
-    val modes = listOf("روزانه", "ماهانه")
+    val modes = listOf("لحظه‌ای", "روزانه", "ماهانه")
     Column(Modifier.fillMaxWidth()) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text("سود/زیان ${chartMode}", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(bottom = 8.dp))
@@ -219,21 +219,43 @@ fun DailyExpensesChart(transactions: List<com.qali.hesabi.data.WalletTransaction
             }
         }
         Spacer(Modifier.height(8.dp))
-        val grouped = transactions.groupBy {
-            val date = java.util.Date(it.date)
-            if (chartMode == "ماهانه") {
-                val jalali = com.qali.hesabi.util.JalaliUtils.toJalaliString(date)
-                jalali.substring(0, 7) // yyyy/MM
-            } else {
-                com.qali.hesabi.util.JalaliUtils.toJalaliString(date)
+
+        val netByGroup = when (chartMode) {
+            "لحظه‌ای" -> {
+                // Sort by date, calculate running net, label with time
+                var runningNet = 0.0
+                transactions.sortedBy { it.date }.map { tx ->
+                    runningNet += if (tx.type == com.qali.hesabi.data.TransactionType.INCOME) tx.amount else -tx.amount
+                    val timeLabel = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(java.util.Date(tx.date))
+                    timeLabel to runningNet.toFloat()
+                }
+            }
+            "ماهانه" -> {
+                val grouped = transactions.groupBy {
+                    val date = java.util.Date(it.date)
+                    val jalali = com.qali.hesabi.util.JalaliUtils.toJalaliString(date)
+                    jalali.substring(0, 7) // yyyy/MM
+                }
+                grouped.map { (date, txs) ->
+                    val income = txs.filter { it.type == com.qali.hesabi.data.TransactionType.INCOME }.sumOf { it.amount }
+                    val expense = txs.filter { it.type == com.qali.hesabi.data.TransactionType.EXPENSE }.sumOf { it.amount }
+                    val net = income - expense
+                    date to net.toFloat()
+                }.sortedBy { it.first }
+            }
+            else -> { // روزانه
+                val grouped = transactions.groupBy {
+                    com.qali.hesabi.util.JalaliUtils.toJalaliString(java.util.Date(it.date))
+                }
+                grouped.map { (date, txs) ->
+                    val income = txs.filter { it.type == com.qali.hesabi.data.TransactionType.INCOME }.sumOf { it.amount }
+                    val expense = txs.filter { it.type == com.qali.hesabi.data.TransactionType.EXPENSE }.sumOf { it.amount }
+                    val net = income - expense
+                    date to net.toFloat()
+                }.sortedBy { it.first }
             }
         }
-        val netByGroup = grouped.map { (date, txs) ->
-            val income = txs.filter { it.type == com.qali.hesabi.data.TransactionType.INCOME }.sumOf { it.amount }
-            val expense = txs.filter { it.type == com.qali.hesabi.data.TransactionType.EXPENSE }.sumOf { it.amount }
-            val net = income - expense
-            date to net.toFloat()
-        }.sortedBy { it.first }
+
         if (netByGroup.isEmpty()) {
             Text("هیچ داده‌ای برای نمایش وجود ندارد", style = MaterialTheme.typography.bodyMedium)
         } else {
