@@ -9,7 +9,7 @@ import com.qali.hesabi.data.converters.ListConverter
 
 @Database(
     entities = [Product::class, Sale::class, Purchase::class, WalletTransaction::class],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(ListConverter::class)
