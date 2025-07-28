@@ -153,7 +153,10 @@ fun DailyExpensesChart(transactions: List<com.qali.hesabi.data.WalletTransaction
                     Button(
                         onClick = { chartMode = mode },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = if (chartMode == mode) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+                            containerColor = if (chartMode == mode)
+                                MaterialTheme.colorScheme.primary
+                            else
+                                MaterialTheme.colorScheme.surface
                         ),
                         modifier = Modifier.padding(horizontal = 4.dp)
                     ) {
@@ -216,7 +219,10 @@ fun LineChart(transactions: List<com.qali.hesabi.data.WalletTransaction>, groupB
             if (points.size > 1) {
                 for (i in 0 until points.size - 1) {
                     drawLine(
-                        color = if (netByGroup[i + 1].second >= 0) Color(0xFF43A047) else Color(0xFFD32F2F),
+                        color = if (netByGroup[i + 1].second >= 0)
+                            Color(0xFF43A047)
+                        else
+                            Color(0xFFD32F2F),
                         start = points[i],
                         end = points[i + 1],
                         strokeWidth = 4f
@@ -226,7 +232,10 @@ fun LineChart(transactions: List<com.qali.hesabi.data.WalletTransaction>, groupB
             // Draw points
             points.forEachIndexed { idx, pt ->
                 drawCircle(
-                    color = if (netByGroup[idx].second >= 0) Color(0xFF43A047) else Color(0xFFD32F2F),
+                    color = if (netByGroup[idx].second >= 0)
+                        Color(0xFF43A047)
+                    else
+                        Color(0xFFD32F2F),
                     radius = 7f,
                     center = pt
                 )
@@ -242,7 +251,10 @@ fun LineChart(transactions: List<com.qali.hesabi.data.WalletTransaction>, groupB
         ) {
             netByGroup.forEach { (date, _) ->
                 Text(
-                    text = if (groupByMonth) date.replace("/", "-") else date.substring(5),
+                    text = if (groupByMonth)
+                        date.replace("/", "-")
+                    else
+                        date.substring(5),
                     style = androidx.compose.material3.MaterialTheme.typography.labelSmall,
                     color = Color.DarkGray,
                     maxLines = 1
