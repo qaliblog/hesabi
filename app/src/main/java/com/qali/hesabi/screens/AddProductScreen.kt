@@ -47,9 +47,10 @@ fun AddProductScreen(navController: NavController, productViewModel: ProductView
     var quantity by remember { mutableStateOf(0) }
     var barcode by remember { mutableStateOf("") }
     var isEdit by remember { mutableStateOf(false) }
+    var initialized by remember { mutableStateOf(false) }
 
     LaunchedEffect(productId) {
-        if (productId != null) {
+        if (productId != null && !initialized) {
             val product = withContext(Dispatchers.IO) { productViewModel.getProductById(productId) }
             product?.let {
                 name = it.name
@@ -57,6 +58,7 @@ fun AddProductScreen(navController: NavController, productViewModel: ProductView
                 quantity = it.quantity
                 barcode = it.barcode
                 isEdit = true
+                initialized = true
             }
         }
     }
