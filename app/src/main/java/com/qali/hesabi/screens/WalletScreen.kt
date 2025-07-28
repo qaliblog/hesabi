@@ -137,66 +137,88 @@ fun WalletScreen(navController: NavController, walletTransactionViewModel: Walle
 
 @Composable
 fun DailyExpensesChart(transactions: List<com.qali.hesabi.data.WalletTransaction>) {
-    val dailyTotals = transactions
-        .filter { it.type == com.qali.hesabi.data.TransactionType.EXPENSE }
-        .groupBy { com.qali.hesabi.util.JalaliUtils.toJalaliString(java.util.Date(it.date)) }
-        .mapValues { entry -> entry.value.sumOf { it.amount } }
-        .toList()
-        .sortedBy { it.first }
-
-    if (dailyTotals.isEmpty()) {
-        Text("هیچ هزینه‌ای برای نمایش وجود ندارد", style = androidx.compose.material3.MaterialTheme.typography.bodyMedium)
-        return
-    }
-
-    val maxAmount = dailyTotals.maxOf { it.second }
-    val barWidth = 40.dp
-    val barSpacing = 24.dp
+    // Group by Jalali date
+    val grouped = transactions.groupBy { com.qali.hesabi.util.JalaliUtils.toJalaliString(java.util.Date(it.date)) }
+    val dailyData = grouped.map { (date, txs) ->
+        val income = txs.filter { it.type == com.qali.hesabi.data.TransactionType.INCOME }.sumOf { it.amount }
+        val expense = txs.filter { it.type == com.qali.hesabi.data.TransactionType.EXPENSE }.sumOf { it.amount }
+        val net = income - expense
+        Triple(date, income, expense)
+    }.sortedBy { it.first }
+    val netList = dailyData.map { it.second - it.third }
+    val maxAbsNet = (netList.map { kotlin.math.abs(it) }.maxOrNull() ?: 1.0).coerceAtLeast(1.0)
+    val barWidth = 36.dp
+    val barSpacing = 28.dp
     val chartHeight = 180.dp
     val scrollState = rememberScrollState()
-
-    Row(
-        Modifier
-            .horizontalScroll(scrollState)
-            .fillMaxWidth()
-    ) {
-        dailyTotals.forEach { (date, amount) ->
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .padding(horizontal = barSpacing / 2)
-            ) {
-                Text(
-                    text = amount.toInt().toString(),
-                    style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
-                    color = Color.Black
-                )
-                Box(
-                    modifier = Modifier
-                        .height(chartHeight)
-                        .width(barWidth),
-                    contentAlignment = Alignment.BottomCenter
+    if (dailyData.isEmpty()) {
+        Text("هیچ داده‌ای برای نمایش وجود ندارد", style = androidx.compose.material3.MaterialTheme.typography.bodyMedium)
+        return
+    }
+    Column(Modifier.fillMaxWidth()) {
+        Text("سود/زیان روزانه", style = androidx.compose.material3.MaterialTheme.typography.titleMedium, modifier = Modifier.padding(bottom = 8.dp))
+        Row(
+            Modifier
+                .horizontalScroll(scrollState)
+                .fillMaxWidth()
+        ) {
+            dailyData.forEach { (date, income, expense) ->
+                val net = income - expense
+                val barColor = if (net >= 0) Color(0xFF43A047) else Color(0xFFD32F2F)
+                val incomeBar = if (maxAbsNet > 0) (income / maxAbsNet * chartHeight.value).toFloat() else 0f
+                val expenseBar = if (maxAbsNet > 0) (expense / maxAbsNet * chartHeight.value).toFloat() else 0f
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(horizontal = barSpacing / 2)
                 ) {
-                    val barHeight = if (maxAmount > 0) (amount / maxAmount * chartHeight.value).toFloat() else 0f
-                    Canvas(
+                    // Net profit/loss label
+                    Text(
+                        text = if (net >= 0) "+${net.toInt()}" else net.toInt().toString(),
+                        color = barColor,
+                        style = androidx.compose.material3.MaterialTheme.typography.bodySmall
+                    )
+                    Box(
                         modifier = Modifier
-                            .fillMaxWidth()
                             .height(chartHeight)
+                            .width(barWidth),
+                        contentAlignment = Alignment.BottomCenter
                     ) {
-                        drawRect(
-                            color = Color(0xFFD32F2F),
-                            topLeft = Offset(0f, size.height - barHeight),
-                            size = androidx.compose.ui.geometry.Size(size.width, barHeight)
-                        )
+                        // Expense bar (red, behind)
+                        if (expense > 0) {
+                            Box(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(expenseBar.dp)
+                                    .align(Alignment.BottomCenter)
+                                    .background(Color(0xFFD32F2F), shape = RoundedCornerShape(6.dp))
+                            )
+                        }
+                        // Income bar (green, in front)
+                        if (income > 0) {
+                            Box(
+                                Modifier
+                                    .fillMaxWidth(0.7f)
+                                    .height(incomeBar.dp)
+                                    .align(Alignment.BottomCenter)
+                                    .background(Color(0xFF43A047), shape = RoundedCornerShape(6.dp))
+                            )
+                        }
                     }
+                    // Date label
+                    Text(
+                        text = date,
+                        style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
+                        color = Color.DarkGray,
+                        maxLines = 1,
+                        modifier = Modifier.padding(top = 2.dp)
+                    )
                 }
-                Text(
-                    text = date,
-                    style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
-                    color = Color.DarkGray,
-                    maxLines = 1
-                )
             }
+        }
+        // Axis labels
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text("درآمد", color = Color(0xFF43A047), style = androidx.compose.material3.MaterialTheme.typography.labelSmall)
+            Text("هزینه", color = Color(0xFFD32F2F), style = androidx.compose.material3.MaterialTheme.typography.labelSmall)
         }
     }
 }
