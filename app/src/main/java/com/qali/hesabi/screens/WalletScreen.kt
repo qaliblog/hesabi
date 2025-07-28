@@ -44,11 +44,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
-import com.patrykandpatrick.vico.compose.chart.line.LineChart
-import com.patrykandpatrick.vico.compose.axis.horizontal.rememberAxis
-import com.patrykandpatrick.vico.compose.axis.vertical.rememberAxis as rememberVerticalAxis
-import com.patrykandpatrick.vico.compose.axis.horizontal.rememberAxis as rememberHorizontalAxis
-import com.patrykandpatrick.vico.core.entry.ChartEntry
+import com.patrykandpatrick.vico.compose.chart.line.lineChart
+import com.patrykandpatrick.vico.compose.axis.horizontal.rememberHorizontalAxis
+import com.patrykandpatrick.vico.compose.axis.vertical.rememberVerticalAxis
 import com.patrykandpatrick.vico.core.entry.entryModelOf
 import com.patrykandpatrick.vico.core.entry.FloatEntry
 import com.patrykandpatrick.vico.compose.component.shape.ShapeComponent
@@ -212,26 +210,21 @@ fun LineChartVico(transactions: List<com.qali.hesabi.data.WalletTransaction>, gr
     val entries = netByGroup.mapIndexed { idx, pair -> FloatEntry(idx.toFloat(), pair.second.toFloat()) }
     val labels = netByGroup.map { it.first }
     val entryModel = entryModelOf(entries)
-    val labelComponent = textComponent {
-        color = Color.DarkGray.toArgb()
-        rotationDegrees = 90f // vertical
-    }
-    val axis = rememberAxis(
+    val horizontalAxis = rememberHorizontalAxis(
         valueFormatter = { value, _ ->
             val i = value.toInt()
             if (i in labels.indices) labels[i] else ""
         },
-        label = labelComponent,
-        guideline = null
+        labelRotationDegrees = 90f
     )
-    val verticalAxis = rememberVerticalAxis(guideline = { Axis.GUIDELINE_AUTO })
+    val verticalAxis = rememberVerticalAxis()
     Column(Modifier.fillMaxWidth()) {
         Box(Modifier.height(220.dp).fillMaxWidth()) {
-            LineChart(
+            lineChart(
                 chart = com.patrykandpatrick.vico.core.chart.line.LineChart(),
                 model = entryModel,
                 startAxis = verticalAxis,
-                bottomAxis = axis,
+                bottomAxis = horizontalAxis,
                 modifier = Modifier.fillMaxSize()
             )
         }
