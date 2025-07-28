@@ -39,6 +39,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.runtime.LaunchedEffect
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import android.util.Log
 
 @Composable
 fun AddProductScreen(navController: NavController, productViewModel: ProductViewModel, productId: Int? = null) {
@@ -48,6 +49,11 @@ fun AddProductScreen(navController: NavController, productViewModel: ProductView
     var barcode by remember { mutableStateOf("") }
     var isEdit by remember { mutableStateOf(false) }
     var initialized by remember { mutableStateOf(false) }
+
+    // Add debugging for form state
+    LaunchedEffect(name, price, quantity, barcode) {
+        Log.d("AddProductScreen", "Form state changed - name: $name, price: $price, quantity: $quantity, barcode: $barcode")
+    }
 
     LaunchedEffect(productId) {
         if (productId != null && !initialized) {
@@ -66,8 +72,10 @@ fun AddProductScreen(navController: NavController, productViewModel: ProductView
     val scannerLauncher = rememberLauncherForActivityResult(
         contract = ScanContract(),
         onResult = { result ->
-            result.contents?.let {
-                barcode = it
+            result.contents?.let { scannedBarcode ->
+                Log.d("AddProductScreen", "Barcode scanned: $scannedBarcode")
+                barcode = scannedBarcode
+                Log.d("AddProductScreen", "Form state after scan - name: $name, price: $price, quantity: $quantity, barcode: $barcode")
             }
         }
     )
