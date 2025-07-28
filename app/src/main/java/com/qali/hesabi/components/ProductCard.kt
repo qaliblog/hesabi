@@ -23,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Snackbar
+import androidx.compose.material3.AlertDialog
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.getValue
@@ -72,6 +73,7 @@ fun ProductCard(
             MaterialTheme.colorScheme.secondary.copy(alpha = 0.10f)
         )
     )
+    val showDialog = remember { mutableStateOf(false) }
     Card(
         shape = MaterialTheme.shapes.large,
         elevation = CardDefaults.cardElevation(8.dp),
@@ -120,7 +122,7 @@ fun ProductCard(
                                 tint = MaterialTheme.colorScheme.primary
                             )
                         }
-                        IconButton(onClick = { onDelete(product) }) {
+                        IconButton(onClick = { showDialog.value = true }) {
                             Icon(
                                 imageVector = androidx.compose.material.icons.Icons.Default.Delete,
                                 contentDescription = "Delete Product",
@@ -168,6 +170,26 @@ fun ProductCard(
                 }
             }
         }
+    }
+    if (showDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showDialog.value = false },
+            title = { Text("تایید حذف") },
+            text = { Text("آیا از حذف این محصول مطمئن هستید؟") },
+            confirmButton = {
+                androidx.compose.material3.TextButton(onClick = {
+                    showDialog.value = false
+                    onDelete(product)
+                }) {
+                    Text("حذف")
+                }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = { showDialog.value = false }) {
+                    Text("انصراف")
+                }
+            }
+        )
     }
 }
 

@@ -27,6 +27,9 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.AlertDialog
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 
 @Composable
 fun WalletCard(
@@ -39,6 +42,7 @@ fun WalletCard(
         TransactionType.EXPENSE -> Color(0xFFD32F2F)
         else -> Color.Gray
     }
+    val showDialog = remember { mutableStateOf(false) }
     Card(
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(0.dp),
@@ -67,7 +71,7 @@ fun WalletCard(
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
-                IconButton(onClick = { onDelete(transaction) }) {
+                IconButton(onClick = { showDialog.value = true }) {
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Delete Transaction",
@@ -76,5 +80,25 @@ fun WalletCard(
                 }
             }
         }
+    }
+    if (showDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showDialog.value = false },
+            title = { Text("تایید حذف") },
+            text = { Text("آیا از حذف این تراکنش مطمئن هستید؟") },
+            confirmButton = {
+                androidx.compose.material3.TextButton(onClick = {
+                    showDialog.value = false
+                    onDelete(transaction)
+                }) {
+                    Text("حذف")
+                }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = { showDialog.value = false }) {
+                    Text("انصراف")
+                }
+            }
+        )
     }
 }

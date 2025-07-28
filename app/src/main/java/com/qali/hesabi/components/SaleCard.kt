@@ -51,6 +51,9 @@ import androidx.compose.ui.graphics.Color as ComposeColor
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 
 @Composable
 fun SaleCard(
@@ -62,6 +65,7 @@ fun SaleCard(
     val dateString = dateFormat.format(Date(sale.date))
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+    val showDialog = remember { mutableStateOf(false) }
     
     Card(
         shape = RoundedCornerShape(20.dp),
@@ -161,7 +165,7 @@ fun SaleCard(
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
-                    IconButton(onClick = { onDelete(sale) }) {
+                    IconButton(onClick = { showDialog.value = true }) {
                         Icon(
                             imageVector = androidx.compose.material.icons.Icons.Default.Delete,
                             contentDescription = "Delete Sale",
@@ -180,6 +184,26 @@ fun SaleCard(
                 }
             }
         }
+    }
+    if (showDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showDialog.value = false },
+            title = { Text("تایید حذف") },
+            text = { Text("آیا از حذف این فروش مطمئن هستید؟") },
+            confirmButton = {
+                androidx.compose.material3.TextButton(onClick = {
+                    showDialog.value = false
+                    onDelete(sale)
+                }) {
+                    Text("حذف")
+                }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = { showDialog.value = false }) {
+                    Text("انصراف")
+                }
+            }
+        )
     }
 }
 

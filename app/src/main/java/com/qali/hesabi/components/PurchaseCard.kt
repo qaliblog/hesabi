@@ -44,6 +44,9 @@ import kotlinx.coroutines.launch
 import android.widget.Toast
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 
 @Composable
 fun PurchaseCard(
@@ -53,7 +56,7 @@ fun PurchaseCard(
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
-
+    val showDialog = remember { mutableStateOf(false) }
     Card(
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(0.dp),
@@ -120,7 +123,7 @@ fun PurchaseCard(
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
-                    IconButton(onClick = { onDelete(purchase) }) {
+                    IconButton(onClick = { showDialog.value = true }) {
                         Icon(
                             imageVector = androidx.compose.material.icons.Icons.Default.Delete,
                             contentDescription = "Delete Purchase",
@@ -148,5 +151,25 @@ fun PurchaseCard(
                 }
             }
         }
+    }
+    if (showDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showDialog.value = false },
+            title = { Text("تایید حذف") },
+            text = { Text("آیا از حذف این خرید مطمئن هستید؟") },
+            confirmButton = {
+                androidx.compose.material3.TextButton(onClick = {
+                    showDialog.value = false
+                    onDelete(purchase)
+                }) {
+                    Text("حذف")
+                }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = { showDialog.value = false }) {
+                    Text("انصراف")
+                }
+            }
+        )
     }
 }
