@@ -41,72 +41,39 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import android.util.Log
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.saveable.listSaver
-
-// State holder for form data
-data class ProductFormState(
-    val name: String = "",
-    val price: Double = 0.0,
-    val quantity: Int = 0,
-    val barcode: String = "",
-    val isEdit: Boolean = false,
-    val initialized: Boolean = false
-) {
-    companion object {
-        val Saver = listSaver<ProductFormState, Any>(
-            save = { state ->
-                listOf(
-                    state.name,
-                    state.price.toString(),
-                    state.quantity.toString(),
-                    state.barcode,
-                    state.isEdit.toString(),
-                    state.initialized.toString()
-                )
-            },
-            restore = { list ->
-                ProductFormState(
-                    name = list[0] as String,
-                    price = (list[1] as String).toDoubleOrNull() ?: 0.0,
-                    quantity = (list[2] as String).toIntOrNull() ?: 0,
-                    barcode = list[3] as String,
-                    isEdit = (list[4] as String).toBoolean(),
-                    initialized = (list[5] as String).toBoolean()
-                )
-            }
-        )
-    }
-}
 
 @Composable
 fun AddProductScreen(navController: NavController, productViewModel: ProductViewModel, productId: Int? = null) {
-    var formState by rememberSaveable(stateSaver = ProductFormState.Saver) { mutableStateOf(ProductFormState()) }
+    var name by rememberSaveable { mutableStateOf("") }
+    var price by rememberSaveable { mutableStateOf(0.0) }
+    var quantity by rememberSaveable { mutableStateOf(0) }
+    var barcode by rememberSaveable { mutableStateOf("") }
+    var isEdit by rememberSaveable { mutableStateOf(false) }
+    var initialized by rememberSaveable { mutableStateOf(false) }
 
     // Add debugging for form state
-    LaunchedEffect(formState) {
+    LaunchedEffect(name, price, quantity, barcode) {
         Log.d(
             "AddProductScreen",
-            "Form state changed - name: ${formState.name}, price: ${formState.price}, " +
-                "quantity: ${formState.quantity}, barcode: ${formState.barcode}"
+            "Form state changed - name: $name, price: $price, " +
+                "quantity: $quantity, barcode: $barcode"
         )
     }
 
     LaunchedEffect(productId) {
-        if (productId != null && !formState.initialized) {
+        if (productId != null && !initialized) {
             val product = withContext(Dispatchers.IO) { productViewModel.getProductById(productId) }
             product?.let {
-                formState = formState.copy(
-                    name = it.name,
-                    price = it.price,
-                    quantity = it.quantity,
-                    barcode = it.barcode,
-                    isEdit = true,
-                    initialized = true
-                )
+                name = it.name
+                price = it.price
+                quantity = it.quantity
+                barcode = it.barcode
+                isEdit = true
+                initialized = true
                 Log.d(
                     "AddProductScreen",
-                    "Product loaded for editing - name: ${formState.name}, price: ${formState.price}, " +
-                        "quantity: ${formState.quantity}, barcode: ${formState.barcode}"
+                    "Product loaded for editing - name: $name, price: $price, " +
+                        "quantity: $quantity, barcode: $barcode"
                 )
             }
         }
@@ -120,14 +87,14 @@ fun AddProductScreen(navController: NavController, productViewModel: ProductView
                 Log.d("AddProductScreen", "Barcode scanned: $scannedBarcode")
                 Log.d(
                     "AddProductScreen",
-                    "Form state before setting barcode - name: ${formState.name}, price: ${formState.price}, " +
-                        "quantity: ${formState.quantity}, barcode: ${formState.barcode}"
+                    "Form state before setting barcode - name: $name, price: $price, " +
+                        "quantity: $quantity, barcode: $barcode"
                 )
-                formState = formState.copy(barcode = scannedBarcode)
+                barcode = scannedBarcode
                 Log.d(
                     "AddProductScreen",
-                    "Form state after setting barcode - name: ${formState.name}, price: ${formState.price}, " +
-                        "quantity: ${formState.quantity}, barcode: ${formState.barcode}"
+                    "Form state after setting barcode - name: $name, price: $price, " +
+                        "quantity: $quantity, barcode: $barcode"
                 )
             }
         }
@@ -139,33 +106,33 @@ fun AddProductScreen(navController: NavController, productViewModel: ProductView
             .padding(24.dp),
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = if (formState.isEdit) "ویرایش محصول" else "افزودن محصول جدید", style = MaterialTheme.typography.headlineSmall)
+        Text(text = if (isEdit) "ویرایش محصول" else "افزودن محصول جدید", style = MaterialTheme.typography.headlineSmall)
         Spacer(modifier = Modifier.height(24.dp))
         OutlinedTextField(
-            value = formState.name,
-            onValueChange = { formState = formState.copy(name = it) },
+            value = name,
+            onValueChange = { name = it },
             label = { Text("نام محصول") },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(12.dp))
         OutlinedTextField(
-            value = if (formState.price == 0.0) "" else formState.price.toString(),
-            onValueChange = { formState = formState.copy(price = it.toEnglishNumbers().toDoubleOrNull() ?: 0.0) },
+            value = if (price == 0.0) "" else price.toString(),
+            onValueChange = { price = it.toEnglishNumbers().toDoubleOrNull() ?: 0.0 },
             label = { Text("قیمت (تومان)") },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(12.dp))
         OutlinedTextField(
-            value = if (formState.quantity == 0) "" else formState.quantity.toString(),
-            onValueChange = { formState = formState.copy(quantity = it.toEnglishNumbers().toIntOrNull() ?: 0) },
+            value = if (quantity == 0) "" else quantity.toString(),
+            onValueChange = { quantity = it.toEnglishNumbers().toIntOrNull() ?: 0 },
             label = { Text("تعداد") },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(12.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             OutlinedTextField(
-                value = formState.barcode,
-                onValueChange = { formState = formState.copy(barcode = it) },
+                value = barcode,
+                onValueChange = { barcode = it },
                 label = { Text("بارکد") },
                 modifier = Modifier.weight(1f)
             )
@@ -185,7 +152,7 @@ fun AddProductScreen(navController: NavController, productViewModel: ProductView
             }
             IconButton(onClick = {
                 val randomBarcode = (1..13).map { _ -> (0..9).random() }.joinToString("")
-                formState = formState.copy(barcode = randomBarcode)
+                barcode = randomBarcode
             }) {
                 Icon(Icons.Filled.QrCodeScanner, contentDescription = "تولید بارکد تصادفی")
             }
@@ -194,24 +161,24 @@ fun AddProductScreen(navController: NavController, productViewModel: ProductView
         Spacer(modifier = Modifier.height(24.dp))
         Button(
             onClick = {
-                if (formState.name.isNotBlank() && formState.price > 0.0 && formState.quantity > 0) {
-                    if (formState.isEdit && productId != null) {
+                if (name.isNotBlank() && price > 0.0 && quantity > 0) {
+                    if (isEdit && productId != null) {
                         productViewModel.update(
                             Product(
                                 id = productId,
-                                name = formState.name,
-                                price = formState.price,
-                                quantity = formState.quantity,
-                                barcode = formState.barcode
+                                name = name,
+                                price = price,
+                                quantity = quantity,
+                                barcode = barcode
                             )
                         )
                     } else {
                         productViewModel.insert(
                             Product(
-                                name = formState.name,
-                                price = formState.price,
-                                quantity = formState.quantity,
-                                barcode = formState.barcode
+                                name = name,
+                                price = price,
+                                quantity = quantity,
+                                barcode = barcode
                             )
                         )
                     }
