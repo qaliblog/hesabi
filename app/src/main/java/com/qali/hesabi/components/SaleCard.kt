@@ -196,21 +196,27 @@ fun SaleCard(
                     }) {
                         Icon(Icons.Filled.ArrowDownward, contentDescription = "دانلود رسید", tint = ComposeColor(0xFF1976D2))
                     }
-                    IconButton(onClick = {
-                        coroutineScope.launch {
-                            val bitmap = generateReceiptBitmapStyled(sale, dateString)
-                            shareBitmap(context, bitmap, "sale-receipt-${sale.id}.png")
-                        }
-                    }) {
-                        Icon(Icons.Filled.ArrowDownward, contentDescription = "اشتراک گذاری رسید", tint = ComposeColor(0xFF388E3C))
+                    IconButton(
+                        onClick = {
+                            coroutineScope.launch {
+                                val bitmap = generateReceiptBitmapStyled(sale, dateString)
+                                shareBitmap(context, bitmap, "sale-receipt-${sale.id}.png")
+                            }
+                        },
+                        modifier = Modifier.background(ComposeColor.Yellow)
+                    ) {
+                        Icon(Icons.Filled.ArrowDownward, contentDescription = "اشتراک گذاری رسید", tint = ComposeColor.Red)
                     }
-                    IconButton(onClick = {
-                        coroutineScope.launch {
-                            val bitmap = generateReceiptBitmapStyled(sale, dateString)
-                            printBitmap(context, bitmap, "رسید فروش")
-                        }
-                    }) {
-                        Icon(Icons.Filled.Edit, contentDescription = "چاپ رسید", tint = ComposeColor(0xFF6D4C41))
+                    IconButton(
+                        onClick = {
+                            coroutineScope.launch {
+                                val bitmap = generateReceiptBitmapStyled(sale, dateString)
+                                printBitmap(context, bitmap, "رسید فروش")
+                            }
+                        },
+                        modifier = Modifier.background(ComposeColor.Yellow)
+                    ) {
+                        Icon(Icons.Filled.Edit, contentDescription = "چاپ رسید", tint = ComposeColor.Red)
                     }
                 }
             }
