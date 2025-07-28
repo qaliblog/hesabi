@@ -54,6 +54,8 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Print
 import android.print.PrintManager
@@ -208,7 +210,7 @@ fun SaleCard(
                             shareBitmap(context, bitmap, "sale-receipt-${sale.id}.png")
                         }
                     }) {
-                        Icon(imageVector = androidx.compose.material.icons.Icons.Default.Favorite, contentDescription = "Test Icon 1", tint = ComposeColor(0xFF388E3C))
+                        Icon(Icons.Filled.Favorite, contentDescription = "Test Icon 1", tint = ComposeColor(0xFF388E3C))
                     }
                     IconButton(onClick = {
                         coroutineScope.launch {
@@ -216,7 +218,7 @@ fun SaleCard(
                             printBitmap(context, bitmap, "رسید فروش")
                         }
                     }) {
-                        Icon(imageVector = androidx.compose.material.icons.Icons.Default.Home, contentDescription = "Test Icon 2", tint = ComposeColor(0xFF6D4C41))
+                        Icon(Icons.Filled.Home, contentDescription = "Test Icon 2", tint = ComposeColor(0xFF6D4C41))
                     }
                 }
             }
