@@ -110,8 +110,10 @@ fun WalletScreen(navController: NavController, walletTransactionViewModel: Walle
             }
         }
         Spacer(modifier = Modifier.height(24.dp))
-        // REMOVE or COMMENT OUT chart code that uses it.date or any date property for WalletTransaction, as it does not exist.
-        // Remove or comment out DailyExpensesChart and related code for now.
+        if (transactions.isNotEmpty()) {
+            DailyExpensesChart(transactions)
+            Spacer(modifier = Modifier.height(24.dp))
+        }
         Button(
             onClick = { navController.navigate(Screen.AddWalletTransaction.route) },
             modifier = Modifier
@@ -126,6 +128,67 @@ fun WalletScreen(navController: NavController, walletTransactionViewModel: Walle
             elevation = androidx.compose.material3.ButtonDefaults.buttonElevation(8.dp)
         ) {
             Text("افزودن تراکنش جدید", style = MaterialTheme.typography.titleLarge)
+        }
+    }
+}
+
+@Composable
+fun DailyExpensesChart(transactions: List<com.qali.hesabi.data.WalletTransaction>) {
+    // Group by Jalali date string, sum expenses only
+    val dailyTotals = transactions
+        .filter { it.type == com.qali.hesabi.data.TransactionType.EXPENSE }
+        .groupBy { com.qali.hesabi.util.JalaliUtils.toJalaliString(java.util.Date(it.date)) }
+        .mapValues { entry -> entry.value.sumOf { it.amount } }
+        .toList()
+        .sortedBy { it.first }
+
+    if (dailyTotals.isEmpty()) {
+        Text("هیچ هزینه‌ای برای نمایش وجود ندارد", style = androidx.compose.material3.MaterialTheme.typography.bodyMedium)
+        return
+    }
+
+    val maxAmount = dailyTotals.maxOf { it.second }
+    val barWidth = 40f
+    val barSpacing = 24f
+    val chartHeight = 180f
+
+    androidx.compose.foundation.horizontalScroll(rememberScrollState()) {
+        androidx.compose.foundation.Canvas(modifier = Modifier
+            .fillMaxWidth()
+            .height(chartHeight.dp)
+            .padding(vertical = 8.dp)) {
+            dailyTotals.forEachIndexed { idx, (date, amount) ->
+                val left = idx * (barWidth + barSpacing)
+                val barHeight = (amount / maxAmount * (size.height - 32f)).toFloat()
+                drawRect(
+                    color = Color(0xFFD32F2F),
+                    topLeft = Offset(left, size.height - barHeight),
+                    size = androidx.compose.ui.geometry.Size(barWidth, barHeight)
+                )
+                drawContext.canvas.nativeCanvas.apply {
+                    drawText(
+                        date,
+                        left + barWidth / 2,
+                        size.height - 4f,
+                        android.graphics.Paint().apply {
+                            textAlign = android.graphics.Paint.Align.CENTER
+                            textSize = 24f
+                            color = android.graphics.Color.DKGRAY
+                        }
+                    )
+                    drawText(
+                        amount.toInt().toString(),
+                        left + barWidth / 2,
+                        size.height - barHeight - 8f,
+                        android.graphics.Paint().apply {
+                            textAlign = android.graphics.Paint.Align.CENTER
+                            textSize = 28f
+                            color = android.graphics.Color.BLACK
+                            isFakeBoldText = true
+                        }
+                    )
+                }
+            }
         }
     }
 }

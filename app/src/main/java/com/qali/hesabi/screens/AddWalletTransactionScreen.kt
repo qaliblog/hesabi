@@ -38,6 +38,7 @@ fun AddWalletTransactionScreen(navController: NavController, walletTransactionVi
     var type by remember { mutableStateOf(0) } // 0: INCOME, 1: EXPENSE
     var description by remember { mutableStateOf("") }
     var isEdit by remember { mutableStateOf(false) }
+    var transactionDate by remember { mutableStateOf(System.currentTimeMillis()) } // Add this line
 
     LaunchedEffect(transactionId) {
         if (transactionId != null) {
@@ -47,6 +48,7 @@ fun AddWalletTransactionScreen(navController: NavController, walletTransactionVi
                 type = if (it.type == TransactionType.INCOME) 0 else 1
                 description = it.description
                 isEdit = true
+                transactionDate = it.date // preserve date for edit
             }
         }
     }
@@ -100,7 +102,8 @@ fun AddWalletTransactionScreen(navController: NavController, walletTransactionVi
                                     id = transactionId,
                                     amount = amt,
                                     type = if (type == 0) TransactionType.INCOME else TransactionType.EXPENSE,
-                                    description = description
+                                    description = description,
+                                    date = transactionDate // use preserved date
                                 )
                             )
                         } else {
@@ -109,6 +112,7 @@ fun AddWalletTransactionScreen(navController: NavController, walletTransactionVi
                                     amount = amt,
                                     type = if (type == 0) TransactionType.INCOME else TransactionType.EXPENSE,
                                     description = description
+                                    // date will default to now
                                 )
                             )
                         }

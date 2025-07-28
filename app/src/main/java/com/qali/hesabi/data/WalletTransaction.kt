@@ -13,5 +13,6 @@ data class WalletTransaction(
     val id: Int = 0,
     val amount: Double,
     val type: TransactionType,
-    val description: String
+    val description: String,
+    val date: Long = System.currentTimeMillis()
 )

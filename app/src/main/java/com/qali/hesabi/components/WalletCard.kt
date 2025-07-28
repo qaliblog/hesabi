@@ -30,6 +30,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.AlertDialog
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import com.qali.hesabi.util.JalaliUtils
+import java.util.Date
 
 @Composable
 fun WalletCard(
@@ -61,6 +63,8 @@ fun WalletCard(
                 Text(text = transaction.description, style = MaterialTheme.typography.titleMedium)
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(text = if (transaction.type == TransactionType.INCOME) "درآمد" else "هزینه", color = color)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(text = "تاریخ: " + JalaliUtils.toJalaliString(Date(transaction.date)), style = MaterialTheme.typography.bodySmall)
             }
             Text(text = "${transaction.amount} تومان", color = color, style = MaterialTheme.typography.titleLarge)
             Row {
