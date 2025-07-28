@@ -114,6 +114,9 @@ fun NavGraph() {
             composable(Screen.Sales.route) { SalesScreen(navController, saleViewModel) }
             composable(Screen.Purchases.route) { PurchasesScreen(navController, purchaseViewModel) }
             composable(Screen.Wallet.route) { WalletScreen(navController, walletTransactionViewModel) }
+            composable(Screen.AddProduct.route) {
+                AddProductScreen(navController, productViewModel, null)
+            }
             composable(Screen.AddProduct.route + "/{productId}") { backStackEntry ->
                 val productId = backStackEntry.arguments?.getString("productId")?.toIntOrNull()
                 AddProductScreen(navController, productViewModel, productId)
