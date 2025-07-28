@@ -72,87 +72,89 @@ fun WalletScreen(navController: NavController, walletTransactionViewModel: Walle
             MaterialTheme.colorScheme.background
         )
     )
-    Column(
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .background(gradient)
-            .padding(24.dp)
+            .padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        androidx.compose.material3.Card(
-            shape = MaterialTheme.shapes.large,
-            elevation = CardDefaults.cardElevation(4.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 20.dp)
-        ) {
-            Text(
-                text = "کیف پول",
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                modifier = Modifier.padding(20.dp)
-            )
-        }
-        androidx.compose.material3.Card(
-            shape = MaterialTheme.shapes.medium,
-            elevation = CardDefaults.cardElevation(2.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
-        ) {
-            Text(
-                text = "موجودی کل: ${overallAmount} تومان",
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(16.dp)
-            )
-        }
-        if (transactions.isEmpty()) {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
+        item {
+            androidx.compose.material3.Card(
+                shape = MaterialTheme.shapes.large,
+                elevation = CardDefaults.cardElevation(4.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 20.dp)
             ) {
-                Spacer(modifier = Modifier.height(32.dp))
                 Text(
-                    text = "هنوز تراکنشی ثبت نشده است",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    text = "کیف پول",
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.padding(20.dp)
                 )
             }
-        } else {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier.weight(1f)
+            androidx.compose.material3.Card(
+                shape = MaterialTheme.shapes.medium,
+                elevation = CardDefaults.cardElevation(2.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
             ) {
-                items(transactions) { transaction ->
-                    WalletCard(
-                        transaction = transaction,
-                        onEdit = { navController.navigate(Screen.AddWalletTransaction.route + "/${transaction.id}") },
-                        onDelete = { walletTransactionViewModel.delete(it) }
+                Text(
+                    text = "موجودی کل: ${overallAmount} تومان",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            if (transactions.isNotEmpty()) {
+                DailyExpensesChart(transactions)
+                Spacer(modifier = Modifier.height(24.dp))
+            }
+        }
+        if (transactions.isEmpty()) {
+            item {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Spacer(modifier = Modifier.height(32.dp))
+                    Text(
+                        text = "هنوز تراکنشی ثبت نشده است",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
+        } else {
+            items(transactions) { transaction ->
+                WalletCard(
+                    transaction = transaction,
+                    onEdit = { navController.navigate(Screen.AddWalletTransaction.route + "/${transaction.id}") },
+                    onDelete = { walletTransactionViewModel.delete(it) }
+                )
+            }
         }
-        Spacer(modifier = Modifier.height(24.dp))
-        if (transactions.isNotEmpty()) {
-            DailyExpensesChart(transactions)
+        item {
             Spacer(modifier = Modifier.height(24.dp))
-        }
-        Button(
-            onClick = { navController.navigate(Screen.AddWalletTransaction.route) },
-            modifier = Modifier
-                .align(Alignment.End)
-                .height(56.dp)
-                .width(220.dp),
-            shape = MaterialTheme.shapes.medium,
-            colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            ),
-            elevation = androidx.compose.material3.ButtonDefaults.buttonElevation(8.dp)
-        ) {
-            Text("افزودن تراکنش جدید", style = MaterialTheme.typography.titleLarge)
+            Button(
+                onClick = { navController.navigate(Screen.AddWalletTransaction.route) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                shape = MaterialTheme.shapes.medium,
+                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ),
+                elevation = androidx.compose.material3.ButtonDefaults.buttonElevation(8.dp)
+            ) {
+                Text("افزودن تراکنش جدید", style = MaterialTheme.typography.titleLarge)
+            }
         }
     }
 }
