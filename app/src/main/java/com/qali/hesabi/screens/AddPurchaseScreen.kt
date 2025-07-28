@@ -11,10 +11,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Text
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
@@ -62,6 +64,7 @@ fun AddPurchaseScreen(navController: NavController, productViewModel: ProductVie
     var searchQuery by remember { mutableStateOf("") }
     var purchaseItems by remember { mutableStateOf(listOf<PurchaseItem>()) }
     var isEdit by remember { mutableStateOf(false) }
+    var editingItemIndex by remember { mutableStateOf<Int?>(null) }
 
     LaunchedEffect(purchaseId) {
         if (purchaseId != null) {
@@ -157,7 +160,12 @@ fun AddPurchaseScreen(navController: NavController, productViewModel: ProductVie
                         price = prc,
                         barcode = selectedProduct!!.barcode
                     )
-                    purchaseItems = purchaseItems + item
+                    if (editingItemIndex != null) {
+                        purchaseItems = purchaseItems.toMutableList().also { it[editingItemIndex!!] = item }
+                        editingItemIndex = null
+                    } else {
+                        purchaseItems = purchaseItems + item
+                    }
                     selectedProduct = null
                     quantity = ""
                     price = ""
@@ -165,14 +173,24 @@ fun AddPurchaseScreen(navController: NavController, productViewModel: ProductVie
             },
             modifier = Modifier.align(Alignment.End)
         ) {
-            Text("افزودن به لیست خرید")
+            Text(if (editingItemIndex != null) "بروزرسانی آیتم" else "افزودن به لیست خرید")
         }
         Spacer(modifier = Modifier.height(24.dp))
         if (purchaseItems.isNotEmpty()) {
             Text("لیست اقلام خریداری شده:", style = MaterialTheme.typography.titleMedium)
             LazyColumn(modifier = Modifier.height(120.dp)) {
-                items(purchaseItems) { item ->
-                    Text("${item.productName} - تعداد: ${item.quantity} - قیمت: ${item.price} تومان")
+                itemsIndexed(purchaseItems) { index, item ->
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("${item.productName} - تعداد: ${item.quantity} - قیمت: ${item.price} تومان", modifier = Modifier.weight(1f))
+                        IconButton(onClick = {
+                            selectedProduct = Product(item.productId, item.productName, item.price, item.barcode) // Assuming Product constructor
+                            quantity = item.quantity.toString()
+                            price = item.price.toString()
+                            editingItemIndex = index
+                        }) {
+                            Icon(Icons.Filled.Edit, contentDescription = "ویرایش آیتم")
+                        }
+                    }
                 }
             }
             Spacer(modifier = Modifier.height(12.dp))
