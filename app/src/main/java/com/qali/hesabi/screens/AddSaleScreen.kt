@@ -59,10 +59,7 @@ import kotlinx.coroutines.withContext
 @Composable
 fun AddSaleScreen(navController: NavController, productViewModel: ProductViewModel, saleViewModel: SaleViewModel, saleId: Int? = null) {
     var buyerName by remember { mutableStateOf("") }
-    var selectedProducts by rememberSaveable(stateSaver = ListSaver(
-        save = { list -> list.map { it.copy() } },
-        restore = { it.map { item -> item as SaleItem } }
-    )) { mutableStateOf<List<SaleItem>>(emptyList()) }
+    var selectedProducts by remember { mutableStateOf<List<SaleItem>>(emptyList()) }
     var showProductDialog by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
     var currentQuantity by remember { mutableStateOf("1") }
