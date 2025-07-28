@@ -107,7 +107,6 @@ fun AddWalletTransactionScreen(navController: NavController, walletTransactionVi
                                 )
                             )
                         } else {
-                            // date will default to now
                             walletTransactionViewModel.insert(
                                 WalletTransaction(
                                     amount = amt,
