@@ -202,7 +202,7 @@ fun SaleCard(
                             shareBitmap(context, bitmap, "sale-receipt-${sale.id}.png")
                         }
                     }) {
-                        Icon(Icons.Filled.Share, contentDescription = "اشتراک گذاری رسید", tint = ComposeColor(0xFF388E3C))
+                        Icon(Icons.Filled.ArrowDownward, contentDescription = "اشتراک گذاری رسید", tint = ComposeColor(0xFF388E3C))
                     }
                     IconButton(onClick = {
                         coroutineScope.launch {
@@ -210,7 +210,7 @@ fun SaleCard(
                             printBitmap(context, bitmap, "رسید فروش")
                         }
                     }) {
-                        Icon(Icons.Filled.Print, contentDescription = "چاپ رسید", tint = ComposeColor(0xFF6D4C41))
+                        Icon(Icons.Filled.Edit, contentDescription = "چاپ رسید", tint = ComposeColor(0xFF6D4C41))
                     }
                 }
             }
