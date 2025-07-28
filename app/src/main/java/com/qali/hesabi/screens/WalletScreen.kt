@@ -38,6 +38,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.foundation.layout.Row
 
 @Composable
 fun WalletScreen(navController: NavController, walletTransactionViewModel: WalletTransactionViewModel) {
@@ -149,56 +150,52 @@ fun DailyExpensesChart(transactions: List<com.qali.hesabi.data.WalletTransaction
     }
 
     val maxAmount = dailyTotals.maxOf { it.second }
-    val barWidth = 40f
-    val barSpacing = 24f
-    val chartHeight = 180f
+    val barWidth = 40.dp
+    val barSpacing = 24.dp
+    val chartHeight = 180.dp
     val scrollState = rememberScrollState()
 
-    Box(
+    Row(
         Modifier
             .horizontalScroll(scrollState)
             .fillMaxWidth()
     ) {
-        Canvas(
-            modifier = Modifier
-                .height(chartHeight.dp)
-                .padding(vertical = 8.dp)
-                .width(((barWidth + barSpacing) * dailyTotals.size).dp)
-        ) {
-            dailyTotals.forEachIndexed { idx, (date, amount) ->
-                val left = idx * (barWidth + barSpacing)
-                val barHeight = (amount / maxAmount * (size.height - 32f)).toFloat()
-                drawRect(
-                    color = Color(0xFFD32F2F),
-                    topLeft = Offset(left, size.height - barHeight),
-                    size = androidx.compose.ui.geometry.Size(barWidth, barHeight)
+        dailyTotals.forEach { (date, amount) ->
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .padding(horizontal = barSpacing / 2)
+            ) {
+                Text(
+                    text = amount.toInt().toString(),
+                    style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
+                    color = Color.Black
                 )
-                // Draw amount above bar and date below bar using drawIntoCanvas
-                drawIntoCanvas { canvas: androidx.compose.ui.graphics.Canvas ->
-                    val paint = android.graphics.Paint().apply {
-                        textAlign = android.graphics.Paint.Align.CENTER
-                        textSize = 28f
-                        color = android.graphics.Color.BLACK
-                        isFakeBoldText = true
+                Box(
+                    modifier = Modifier
+                        .height(chartHeight)
+                        .width(barWidth),
+                    contentAlignment = Alignment.BottomCenter
+                ) {
+                    val barHeight = if (maxAmount > 0) (amount / maxAmount * chartHeight.value).toFloat() else 0f
+                    Canvas(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(chartHeight)
+                    ) {
+                        drawRect(
+                            color = Color(0xFFD32F2F),
+                            topLeft = Offset(0f, size.height - barHeight),
+                            size = androidx.compose.ui.geometry.Size(size.width, barHeight)
+                        )
                     }
-                    canvas.nativeCanvas.drawText(
-                        amount.toInt().toString(),
-                        left + barWidth / 2,
-                        size.height - barHeight - 8f,
-                        paint
-                    )
-                    val datePaint = android.graphics.Paint().apply {
-                        textAlign = android.graphics.Paint.Align.CENTER
-                        textSize = 24f
-                        color = android.graphics.Color.DKGRAY
-                    }
-                    canvas.nativeCanvas.drawText(
-                        date,
-                        left + barWidth / 2,
-                        size.height - 4f,
-                        datePaint
-                    )
                 }
+                Text(
+                    text = date,
+                    style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
+                    color = Color.DarkGray,
+                    maxLines = 1
+                )
             }
         }
     }
