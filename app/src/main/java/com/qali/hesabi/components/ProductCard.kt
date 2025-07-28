@@ -96,7 +96,7 @@ fun ProductCard(
     ) {
         Column(
             modifier = Modifier
-                .background(Color.Transparent)
+                .fillMaxWidth()
                 .padding(20.dp)
         ) {
             Row(
@@ -122,79 +122,85 @@ fun ProductCard(
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 }
-                Spacer(modifier = Modifier.width(16.dp))
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    BarcodeView(barcode = product.barcode)
-                    Row {
-                        IconButton(onClick = { onEdit(product) }) {
-                            Icon(
-                                imageVector = androidx.compose.material.icons.Icons.Default.Edit,
-                                contentDescription = "Edit Product",
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(8.dp))
-                        IconButton(onClick = { showDialog.value = true }) {
-                            Icon(
-                                imageVector = androidx.compose.material.icons.Icons.Default.Delete,
-                                contentDescription = "Delete Product",
-                                tint = MaterialTheme.colorScheme.error
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(8.dp))
-                        IconButton(
-                            onClick = {
-                                coroutineScope.launch {
-                                    downloadStatus = DownloadStatus.Downloading
-                                    try {
-                                        requestPermission()
-                                        val barcodeEncoder = BarcodeEncoder()
-                                        val bitmap = barcodeEncoder.encodeBitmap(product.barcode, BarcodeFormat.CODE_128, 400, 150)
-                                        val success = saveBitmap(context, bitmap, "${product.name}-barcode.png")
-                                        if (success) {
-                                            downloadStatus = DownloadStatus.Success
-                                            Toast.makeText(context, "بارکد با موفقیت دانلود شد", Toast.LENGTH_SHORT).show()
-                                        } else {
-                                            downloadStatus = DownloadStatus.Error
-                                            Toast.makeText(context, "خطا در دانلود بارکد", Toast.LENGTH_SHORT).show()
-                                        }
-                                    } catch (e: Exception) {
-                                        Log.e("ProductCard", "Error downloading barcode", e)
-                                        downloadStatus = DownloadStatus.Error
-                                        Toast.makeText(context, "خطا در دانلود بارکد: ${e.message}", Toast.LENGTH_SHORT).show()
-                                    }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            // Center barcode
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                BarcodeView(barcode = product.barcode)
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            // Center action row
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = { onEdit(product) }) {
+                    Icon(
+                        imageVector = androidx.compose.material.icons.Icons.Default.Edit,
+                        contentDescription = "Edit Product",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                IconButton(onClick = { showDialog.value = true }) {
+                    Icon(
+                        imageVector = androidx.compose.material.icons.Icons.Default.Delete,
+                        contentDescription = "Delete Product",
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                IconButton(
+                    onClick = {
+                        coroutineScope.launch {
+                            downloadStatus = DownloadStatus.Downloading
+                            try {
+                                requestPermission()
+                                val barcodeEncoder = BarcodeEncoder()
+                                val bitmap = barcodeEncoder.encodeBitmap(product.barcode, BarcodeFormat.CODE_128, 400, 150)
+                                val success = saveBitmap(context, bitmap, "${product.name}-barcode.png")
+                                if (success) {
+                                    downloadStatus = DownloadStatus.Success
+                                    Toast.makeText(context, "بارکد با موفقیت دانلود شد", Toast.LENGTH_SHORT).show()
+                                } else {
+                                    downloadStatus = DownloadStatus.Error
+                                    Toast.makeText(context, "خطا در دانلود بارکد", Toast.LENGTH_SHORT).show()
                                 }
-                            },
-                            // Remove extra background and padding for consistency
-                        ) {
-                            when (downloadStatus) {
-                                DownloadStatus.Idle -> Icon(Icons.Filled.ArrowDownward, contentDescription = "دانلود بارکد", tint = MaterialTheme.colorScheme.onPrimary)
-                                DownloadStatus.Downloading -> Icon(Icons.Filled.ArrowDownward, contentDescription = "در حال دانلود", tint = MaterialTheme.colorScheme.onPrimary)
-                                DownloadStatus.Success -> Icon(Icons.Filled.Check, contentDescription = "دانلود شد", tint = MaterialTheme.colorScheme.tertiary)
-                                DownloadStatus.Error -> Icon(Icons.Filled.Error, contentDescription = "خطا", tint = MaterialTheme.colorScheme.error)
+                            } catch (e: Exception) {
+                                Log.e("ProductCard", "Error downloading barcode", e)
+                                downloadStatus = DownloadStatus.Error
+                                Toast.makeText(context, "خطا در دانلود بارکد: ${e.message}", Toast.LENGTH_SHORT).show()
                             }
                         }
-                        Spacer(modifier = Modifier.width(8.dp))
-                        IconButton(onClick = {
-                            coroutineScope.launch {
-                                val barcodeEncoder = BarcodeEncoder()
-                                val bitmap = barcodeEncoder.encodeBitmap(product.barcode, BarcodeFormat.CODE_128, 400, 150)
-                                shareBitmap(context, bitmap, "${product.name}-barcode.png")
-                            }
-                        }) {
-                            Icon(Icons.Filled.Share, contentDescription = "اشتراک گذاری بارکد", tint = MaterialTheme.colorScheme.secondary)
-                        }
-                        Spacer(modifier = Modifier.width(8.dp))
-                        IconButton(onClick = {
-                            coroutineScope.launch {
-                                val barcodeEncoder = BarcodeEncoder()
-                                val bitmap = barcodeEncoder.encodeBitmap(product.barcode, BarcodeFormat.CODE_128, 400, 150)
-                                printBitmap(context, bitmap, "بارکد محصول")
-                            }
-                        }) {
-                            Icon(Icons.Filled.Print, contentDescription = "چاپ بارکد", tint = MaterialTheme.colorScheme.tertiary)
-                        }
+                    },
+                ) {
+                    when (downloadStatus) {
+                        DownloadStatus.Idle -> Icon(Icons.Filled.ArrowDownward, contentDescription = "دانلود بارکد", tint = MaterialTheme.colorScheme.onPrimary)
+                        DownloadStatus.Downloading -> Icon(Icons.Filled.ArrowDownward, contentDescription = "در حال دانلود", tint = MaterialTheme.colorScheme.onPrimary)
+                        DownloadStatus.Success -> Icon(Icons.Filled.Check, contentDescription = "دانلود شد", tint = MaterialTheme.colorScheme.tertiary)
+                        DownloadStatus.Error -> Icon(Icons.Filled.Error, contentDescription = "خطا", tint = MaterialTheme.colorScheme.error)
                     }
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                IconButton(onClick = {
+                    coroutineScope.launch {
+                        val barcodeEncoder = BarcodeEncoder()
+                        val bitmap = barcodeEncoder.encodeBitmap(product.barcode, BarcodeFormat.CODE_128, 400, 150)
+                        shareBitmap(context, bitmap, "${product.name}-barcode.png")
+                    }
+                }) {
+                    Icon(Icons.Filled.Share, contentDescription = "اشتراک گذاری بارکد", tint = MaterialTheme.colorScheme.secondary)
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                IconButton(onClick = {
+                    coroutineScope.launch {
+                        val barcodeEncoder = BarcodeEncoder()
+                        val bitmap = barcodeEncoder.encodeBitmap(product.barcode, BarcodeFormat.CODE_128, 400, 150)
+                        printBitmap(context, bitmap, "بارکد محصول")
+                    }
+                }) {
+                    Icon(Icons.Filled.Print, contentDescription = "چاپ بارکد", tint = MaterialTheme.colorScheme.tertiary)
                 }
             }
         }
