@@ -183,7 +183,13 @@ fun AddPurchaseScreen(navController: NavController, productViewModel: ProductVie
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text("${item.productName} - تعداد: ${item.quantity} - قیمت: ${item.price} تومان", modifier = Modifier.weight(1f))
                         IconButton(onClick = {
-                            selectedProduct = Product(item.productId, item.productName, item.price, item.barcode) // Assuming Product constructor
+                            selectedProduct = Product(
+                                id = item.productId,
+                                name = item.productName,
+                                price = item.price,
+                                quantity = 0, // Not tracked in PurchaseItem
+                                barcode = item.barcode
+                            )
                             quantity = item.quantity.toString()
                             price = item.price.toString()
                             editingItemIndex = index
