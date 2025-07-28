@@ -103,7 +103,7 @@ fun AddWalletTransactionScreen(navController: NavController, walletTransactionVi
                                     amount = amt,
                                     type = if (type == 0) TransactionType.INCOME else TransactionType.EXPENSE,
                                     description = description,
-                                    date = transactionDate // use preserved date
+                                    date = transactionDate
                                 )
                             )
                         } else {
