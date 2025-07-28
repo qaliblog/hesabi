@@ -65,6 +65,7 @@ import android.graphics.pdf.PdfDocument
 import android.os.CancellationSignal
 import android.os.ParcelFileDescriptor
 import java.io.FileOutputStream
+import android.print.PageRange
 
 @Composable
 fun SaleCard(
@@ -374,10 +375,10 @@ private fun printBitmap(context: android.content.Context, bitmap: Bitmap, jobNam
             callback?.onLayoutFinished(info, true)
         }
         override fun onWrite(
-            pages: Array<out PageRange>?,
-            destination: ParcelFileDescriptor?,
-            cancellationSignal: CancellationSignal?,
-            callback: WriteResultCallback?
+            pages: Array<PageRange>,
+            destination: ParcelFileDescriptor,
+            cancellationSignal: CancellationSignal,
+            callback: WriteResultCallback
         ) {
             val pdfDocument = PrintedPdfDocument(context, PrintAttributes.Builder().build())
             val page = pdfDocument.startPage(0)
@@ -385,10 +386,10 @@ private fun printBitmap(context: android.content.Context, bitmap: Bitmap, jobNam
             canvas.drawBitmap(bitmap, 0f, 0f, null)
             pdfDocument.finishPage(page)
             try {
-                pdfDocument.writeTo(FileOutputStream(destination?.fileDescriptor))
-                callback?.onWriteFinished(arrayOf(PageRange.ALL_PAGES))
+                pdfDocument.writeTo(FileOutputStream(destination.fileDescriptor))
+                callback.onWriteFinished(arrayOf(PageRange.ALL_PAGES))
             } catch (e: Exception) {
-                callback?.onWriteFailed(e.toString())
+                callback.onWriteFailed(e.toString())
             } finally {
                 pdfDocument.close()
             }
