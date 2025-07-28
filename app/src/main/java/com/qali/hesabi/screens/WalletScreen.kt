@@ -39,8 +39,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.foundation.layout.Row
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonItem
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -149,11 +148,19 @@ fun DailyExpensesChart(transactions: List<com.qali.hesabi.data.WalletTransaction
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text("سود/زیان ${chartMode}", style = androidx.compose.material3.MaterialTheme.typography.titleMedium, modifier = Modifier.padding(bottom = 8.dp))
             Spacer(Modifier.weight(1f))
-            SegmentedButton(
-                selectedIndex = modes.indexOf(chartMode),
-                onItemSelected = { chartMode = modes[it] },
-                items = modes
-            )
+            Row {
+                modes.forEach { mode ->
+                    Button(
+                        onClick = { chartMode = mode },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (chartMode == mode) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+                        ),
+                        modifier = Modifier.padding(horizontal = 4.dp)
+                    ) {
+                        Text(mode)
+                    }
+                }
+            }
         }
         Spacer(Modifier.height(8.dp))
         if (chartMode == "روزانه") {
@@ -203,8 +210,8 @@ fun LineChart(transactions: List<com.qali.hesabi.data.WalletTransaction>, groupB
         ) {
             val points = netByGroup.mapIndexed { idx, pair ->
                 val x = idx * (size.width / (netByGroup.size - 1).coerceAtLeast(1))
-                val y = size.height - ((pair.second - minNet) / (maxNet - minNet + 1e-6).toFloat() * size.height)
-                Offset(x, y)
+                val y = size.height - (((pair.second - minNet) / (maxNet - minNet + 1e-6)).toFloat() * size.height)
+                Offset(x.toFloat(), y.toFloat())
             }
             if (points.size > 1) {
                 for (i in 0 until points.size - 1) {
