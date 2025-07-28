@@ -39,6 +39,12 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.foundation.layout.Row
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonItem
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
 
 @Composable
 fun WalletScreen(navController: NavController, walletTransactionViewModel: WalletTransactionViewModel) {
@@ -137,88 +143,104 @@ fun WalletScreen(navController: NavController, walletTransactionViewModel: Walle
 
 @Composable
 fun DailyExpensesChart(transactions: List<com.qali.hesabi.data.WalletTransaction>) {
-    // Group by Jalali date
-    val grouped = transactions.groupBy { com.qali.hesabi.util.JalaliUtils.toJalaliString(java.util.Date(it.date)) }
-    val dailyData = grouped.map { (date, txs) ->
+    var chartMode by remember { mutableStateOf("روزانه") }
+    val modes = listOf("روزانه", "ماهانه")
+    Column(Modifier.fillMaxWidth()) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text("سود/زیان ${chartMode}", style = androidx.compose.material3.MaterialTheme.typography.titleMedium, modifier = Modifier.padding(bottom = 8.dp))
+            Spacer(Modifier.weight(1f))
+            SegmentedButton(
+                selectedIndex = modes.indexOf(chartMode),
+                onItemSelected = { chartMode = modes[it] },
+                items = modes
+            )
+        }
+        Spacer(Modifier.height(8.dp))
+        if (chartMode == "روزانه") {
+            LineChart(transactions, groupByMonth = false)
+        } else {
+            LineChart(transactions, groupByMonth = true)
+        }
+    }
+}
+
+@Composable
+fun LineChart(transactions: List<com.qali.hesabi.data.WalletTransaction>, groupByMonth: Boolean) {
+    // Group by Jalali date (day or month)
+    val grouped = transactions.groupBy {
+        val date = java.util.Date(it.date)
+        if (groupByMonth) {
+            val jalali = com.qali.hesabi.util.JalaliUtils.toJalaliString(date)
+            jalali.substring(0, 7) // yyyy/MM
+        } else {
+            com.qali.hesabi.util.JalaliUtils.toJalaliString(date)
+        }
+    }
+    val netByGroup = grouped.map { (date, txs) ->
         val income = txs.filter { it.type == com.qali.hesabi.data.TransactionType.INCOME }.sumOf { it.amount }
         val expense = txs.filter { it.type == com.qali.hesabi.data.TransactionType.EXPENSE }.sumOf { it.amount }
         val net = income - expense
-        Triple(date, income, expense)
+        date to net
     }.sortedBy { it.first }
-    val netList = dailyData.map { it.second - it.third }
-    val maxAbsNet = (netList.map { kotlin.math.abs(it) }.maxOrNull() ?: 1.0).coerceAtLeast(1.0)
-    val barWidth = 36.dp
-    val barSpacing = 28.dp
-    val chartHeight = 180.dp
-    val scrollState = rememberScrollState()
-    if (dailyData.isEmpty()) {
+    if (netByGroup.isEmpty()) {
         Text("هیچ داده‌ای برای نمایش وجود ندارد", style = androidx.compose.material3.MaterialTheme.typography.bodyMedium)
         return
     }
-    Column(Modifier.fillMaxWidth()) {
-        Text("سود/زیان روزانه", style = androidx.compose.material3.MaterialTheme.typography.titleMedium, modifier = Modifier.padding(bottom = 8.dp))
-        Row(
-            Modifier
-                .horizontalScroll(scrollState)
-                .fillMaxWidth()
+    val maxNet = netByGroup.maxOf { it.second }
+    val minNet = netByGroup.minOf { it.second }
+    val chartHeight = 180.dp
+    val chartWidth = (netByGroup.size * 60).dp.coerceAtLeast(300.dp)
+    val scrollState = rememberScrollState()
+    Box(
+        Modifier
+            .horizontalScroll(scrollState)
+            .fillMaxWidth()
+    ) {
+        Canvas(
+            modifier = Modifier
+                .height(chartHeight)
+                .width(chartWidth)
         ) {
-            dailyData.forEach { (date, income, expense) ->
-                val net = income - expense
-                val barColor = if (net >= 0) Color(0xFF43A047) else Color(0xFFD32F2F)
-                val incomeBar = if (maxAbsNet > 0) (income / maxAbsNet * chartHeight.value).toFloat() else 0f
-                val expenseBar = if (maxAbsNet > 0) (expense / maxAbsNet * chartHeight.value).toFloat() else 0f
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.padding(horizontal = barSpacing / 2)
-                ) {
-                    // Net profit/loss label
-                    Text(
-                        text = if (net >= 0) "+${net.toInt()}" else net.toInt().toString(),
-                        color = barColor,
-                        style = androidx.compose.material3.MaterialTheme.typography.bodySmall
-                    )
-                    Box(
-                        modifier = Modifier
-                            .height(chartHeight)
-                            .width(barWidth),
-                        contentAlignment = Alignment.BottomCenter
-                    ) {
-                        // Expense bar (red, behind)
-                        if (expense > 0) {
-                            Box(
-                                Modifier
-                                    .fillMaxWidth()
-                                    .height(expenseBar.dp)
-                                    .align(Alignment.BottomCenter)
-                                    .background(Color(0xFFD32F2F), shape = RoundedCornerShape(6.dp))
-                            )
-                        }
-                        // Income bar (green, in front)
-                        if (income > 0) {
-                            Box(
-                                Modifier
-                                    .fillMaxWidth(0.7f)
-                                    .height(incomeBar.dp)
-                                    .align(Alignment.BottomCenter)
-                                    .background(Color(0xFF43A047), shape = RoundedCornerShape(6.dp))
-                            )
-                        }
-                    }
-                    // Date label
-                    Text(
-                        text = date,
-                        style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
-                        color = Color.DarkGray,
-                        maxLines = 1,
-                        modifier = Modifier.padding(top = 2.dp)
+            val points = netByGroup.mapIndexed { idx, pair ->
+                val x = idx * (size.width / (netByGroup.size - 1).coerceAtLeast(1))
+                val y = size.height - ((pair.second - minNet) / (maxNet - minNet + 1e-6).toFloat() * size.height)
+                Offset(x, y)
+            }
+            if (points.size > 1) {
+                for (i in 0 until points.size - 1) {
+                    drawLine(
+                        color = if (netByGroup[i + 1].second >= 0) Color(0xFF43A047) else Color(0xFFD32F2F),
+                        start = points[i],
+                        end = points[i + 1],
+                        strokeWidth = 4f
                     )
                 }
             }
+            // Draw points
+            points.forEachIndexed { idx, pt ->
+                drawCircle(
+                    color = if (netByGroup[idx].second >= 0) Color(0xFF43A047) else Color(0xFFD32F2F),
+                    radius = 7f,
+                    center = pt
+                )
+            }
         }
-        // Axis labels
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text("درآمد", color = Color(0xFF43A047), style = androidx.compose.material3.MaterialTheme.typography.labelSmall)
-            Text("هزینه", color = Color(0xFFD32F2F), style = androidx.compose.material3.MaterialTheme.typography.labelSmall)
+        // X axis labels
+        Row(
+            Modifier
+                .align(Alignment.BottomStart)
+                .padding(top = chartHeight + 4.dp)
+                .width(chartWidth),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            netByGroup.forEach { (date, _) ->
+                Text(
+                    text = if (groupByMonth) date.replace("/", "-") else date.substring(5),
+                    style = androidx.compose.material3.MaterialTheme.typography.labelSmall,
+                    color = Color.DarkGray,
+                    maxLines = 1
+                )
+            }
         }
     }
 }
