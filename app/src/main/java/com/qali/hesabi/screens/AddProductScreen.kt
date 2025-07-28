@@ -58,7 +58,11 @@ fun AddProductScreen(navController: NavController, productViewModel: ProductView
 
     // Add debugging for form state
     LaunchedEffect(formState) {
-        Log.d("AddProductScreen", "Form state changed - name: ${formState.name}, price: ${formState.price}, quantity: ${formState.quantity}, barcode: ${formState.barcode}")
+        Log.d(
+            "AddProductScreen",
+            "Form state changed - name: ${formState.name}, price: ${formState.price}, " +
+                "quantity: ${formState.quantity}, barcode: ${formState.barcode}"
+        )
     }
 
     LaunchedEffect(productId) {
@@ -73,7 +77,11 @@ fun AddProductScreen(navController: NavController, productViewModel: ProductView
                     isEdit = true,
                     initialized = true
                 )
-                Log.d("AddProductScreen", "Product loaded for editing - name: ${formState.name}, price: ${formState.price}, quantity: ${formState.quantity}, barcode: ${formState.barcode}")
+                Log.d(
+                    "AddProductScreen",
+                    "Product loaded for editing - name: ${formState.name}, price: ${formState.price}, " +
+                        "quantity: ${formState.quantity}, barcode: ${formState.barcode}"
+                )
             }
         }
     }
@@ -84,9 +92,17 @@ fun AddProductScreen(navController: NavController, productViewModel: ProductView
             Log.d("AddProductScreen", "Scanner result received: ${result.contents}")
             result.contents?.let { scannedBarcode ->
                 Log.d("AddProductScreen", "Barcode scanned: $scannedBarcode")
-                Log.d("AddProductScreen", "Form state before setting barcode - name: ${formState.name}, price: ${formState.price}, quantity: ${formState.quantity}, barcode: ${formState.barcode}")
+                Log.d(
+                    "AddProductScreen",
+                    "Form state before setting barcode - name: ${formState.name}, price: ${formState.price}, " +
+                        "quantity: ${formState.quantity}, barcode: ${formState.barcode}"
+                )
                 formState = formState.copy(barcode = scannedBarcode)
-                Log.d("AddProductScreen", "Form state after setting barcode - name: ${formState.name}, price: ${formState.price}, quantity: ${formState.quantity}, barcode: ${formState.barcode}")
+                Log.d(
+                    "AddProductScreen",
+                    "Form state after setting barcode - name: ${formState.name}, price: ${formState.price}, " +
+                        "quantity: ${formState.quantity}, barcode: ${formState.barcode}"
+                )
             }
         }
     )
