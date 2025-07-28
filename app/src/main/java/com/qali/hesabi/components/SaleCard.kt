@@ -59,10 +59,13 @@ import androidx.compose.runtime.remember
 fun SaleCard(
     sale: Sale,
     onEdit: (Sale) -> Unit = {},
-    onDelete: (Sale) -> Unit = {}
+    onDelete: (Sale) -> Unit = {},
+    jalaliDate: String = ""
 ) {
-    val dateFormat = SimpleDateFormat("yyyy/MM/dd HH:mm", Locale("fa"))
-    val dateString = dateFormat.format(Date(sale.date))
+    val dateString = jalaliDate.ifEmpty {
+        val dateFormat = SimpleDateFormat("yyyy/MM/dd HH:mm", Locale("fa"))
+        dateFormat.format(Date(sale.date))
+    }
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val showDialog = remember { mutableStateOf(false) }

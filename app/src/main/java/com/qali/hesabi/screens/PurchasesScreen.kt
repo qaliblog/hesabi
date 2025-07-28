@@ -28,6 +28,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.material3.CardDefaults
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.width
+import com.qali.hesabi.util.JalaliUtils
+import java.util.Date
 
 @Composable
 fun PurchasesScreen(navController: NavController, purchaseViewModel: PurchaseViewModel) {
@@ -80,7 +82,8 @@ fun PurchasesScreen(navController: NavController, purchaseViewModel: PurchaseVie
                     PurchaseCard(
                         purchase = purchase,
                         onEdit = { navController.navigate(Screen.AddPurchase.route + "/${purchase.id}") },
-                        onDelete = { purchaseViewModel.delete(it) }
+                        onDelete = { purchaseViewModel.delete(it) },
+                        jalaliDate = JalaliUtils.toJalaliString(Date(purchase.date))
                     )
                 }
             }

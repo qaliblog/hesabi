@@ -27,6 +27,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.material3.CardDefaults
 import androidx.compose.foundation.layout.width
+import com.qali.hesabi.util.JalaliUtils
+import java.util.Date
 
 @Composable
 fun SalesScreen(navController: NavController, saleViewModel: SaleViewModel) {
@@ -79,7 +81,8 @@ fun SalesScreen(navController: NavController, saleViewModel: SaleViewModel) {
                     SaleCard(
                         sale = sale,
                         onEdit = { navController.navigate(Screen.AddSale.route + "/${sale.id}") },
-                        onDelete = { saleViewModel.delete(it) }
+                        onDelete = { saleViewModel.delete(it) },
+                        jalaliDate = JalaliUtils.toJalaliString(Date(sale.date))
                     )
                 }
             }

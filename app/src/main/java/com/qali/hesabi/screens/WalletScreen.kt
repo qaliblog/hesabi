@@ -28,6 +28,14 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.material3.CardDefaults
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.width
+import com.qali.hesabi.util.JalaliUtils
+import java.util.Date
+import androidx.compose.foundation.Canvas
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.horizontalScroll
 
 @Composable
 fun WalletScreen(navController: NavController, walletTransactionViewModel: WalletTransactionViewModel) {
@@ -102,6 +110,13 @@ fun WalletScreen(navController: NavController, walletTransactionViewModel: Walle
             }
         }
         Spacer(modifier = Modifier.height(24.dp))
+        // Chart for daily expenses
+        if (transactions.isNotEmpty()) {
+            val expensesByDay = transactions.filter { it.type.name == "EXPENSE" }
+                .groupBy { JalaliUtils.toJalaliString(Date(it.date)) }
+                .mapValues { entry -> entry.value.sumOf { it.amount } }
+            DailyExpensesChart(expensesByDay)
+        }
         Button(
             onClick = { navController.navigate(Screen.AddWalletTransaction.route) },
             modifier = Modifier
@@ -116,6 +131,54 @@ fun WalletScreen(navController: NavController, walletTransactionViewModel: Walle
             elevation = androidx.compose.material3.ButtonDefaults.buttonElevation(8.dp)
         ) {
             Text("افزودن تراکنش جدید", style = MaterialTheme.typography.titleLarge)
+        }
+    }
+}
+
+@Composable
+fun DailyExpensesChart(expensesByDay: Map<String, Int>) {
+    val barWidth = 40f
+    val maxAmount = expensesByDay.values.maxOrNull() ?: 1
+    val chartHeight = 200f
+    val barSpacing = 24f
+    val dates = expensesByDay.keys.toList()
+    val amounts = expensesByDay.values.toList()
+    androidx.compose.foundation.horizontalScroll(rememberScrollState()) {
+        Canvas(modifier = Modifier
+            .fillMaxWidth()
+            .height(220.dp)
+            .padding(vertical = 8.dp)) {
+            for (i in dates.indices) {
+                val left = i * (barWidth + barSpacing)
+                val barHeight = (amounts[i].toFloat() / maxAmount) * chartHeight
+                drawRect(
+                    color = Color.Red,
+                    topLeft = Offset(left, chartHeight - barHeight),
+                    size = androidx.compose.ui.geometry.Size(barWidth, barHeight)
+                )
+                drawContext.canvas.nativeCanvas.apply {
+                    drawText(
+                        dates[i],
+                        left,
+                        chartHeight + 30f,
+                        android.graphics.Paint().apply {
+                            color = android.graphics.Color.BLACK
+                            textSize = 28f
+                            textAlign = android.graphics.Paint.Align.LEFT
+                        }
+                    )
+                    drawText(
+                        amounts[i].toString(),
+                        left,
+                        chartHeight - barHeight - 10f,
+                        android.graphics.Paint().apply {
+                            color = android.graphics.Color.RED
+                            textSize = 32f
+                            textAlign = android.graphics.Paint.Align.LEFT
+                        }
+                    )
+                }
+            }
         }
     }
 }

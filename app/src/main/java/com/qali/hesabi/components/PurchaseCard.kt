@@ -52,7 +52,8 @@ import androidx.compose.runtime.remember
 fun PurchaseCard(
     purchase: Purchase,
     onEdit: (Purchase) -> Unit = {},
-    onDelete: (Purchase) -> Unit = {}
+    onDelete: (Purchase) -> Unit = {},
+    jalaliDate: String = ""
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -89,6 +90,17 @@ fun PurchaseCard(
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(8.dp))
+                if (jalaliDate.isNotEmpty()) {
+                    Text(
+                        text = "تاریخ: $jalaliDate",
+                        style = TextStyle(
+                            fontSize = 14.sp,
+                            color = Color(0xFF333333),
+                            textAlign = TextAlign.Right
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
                 purchase.items.forEach { item ->
                     Text(
                         text = "${item.productName}  |  تعداد: ${item.quantity}  |  قیمت واحد: ${item.price} تومان",

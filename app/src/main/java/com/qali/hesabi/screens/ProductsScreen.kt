@@ -28,10 +28,33 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.material3.CardDefaults
 import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Warehouse
+import androidx.compose.material3.Icon
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.IconButton
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import com.qali.hesabi.ui.SaleViewModel
+import com.qali.hesabi.ui.PurchaseViewModel
+import com.qali.hesabi.data.Product
+import com.qali.hesabi.data.Sale
+import com.qali.hesabi.data.Purchase
+import androidx.compose.foundation.layout.Row
+import androidx.compose.ui.unit.width
+import androidx.compose.material.icons.filled.ArrowDropDown
 
 @Composable
-fun ProductsScreen(navController: NavController, productViewModel: ProductViewModel) {
+fun ProductsScreen(
+    navController: NavController,
+    productViewModel: ProductViewModel,
+    saleViewModel: SaleViewModel,
+    purchaseViewModel: PurchaseViewModel
+) {
     val products by productViewModel.allProducts.collectAsState(initial = emptyList())
+    val sales by saleViewModel.allSales.collectAsState(initial = emptyList())
+    val purchases by purchaseViewModel.allPurchases.collectAsState(initial = emptyList())
     val gradient = Brush.verticalGradient(
         colors = listOf(
             MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
@@ -69,6 +92,49 @@ fun ProductsScreen(navController: NavController, productViewModel: ProductViewMo
                     onEdit = { navController.navigate(Screen.AddProduct.route + "/${product.id}") },
                     onDelete = { productViewModel.delete(it) }
                 )
+            }
+        }
+        Spacer(modifier = Modifier.height(24.dp))
+        // Warehouse section
+        androidx.compose.material3.Card(
+            shape = MaterialTheme.shapes.large,
+            elevation = CardDefaults.cardElevation(4.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 20.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(16.dp)) {
+                Icon(Icons.Filled.Warehouse, contentDescription = "Warehouse", tint = MaterialTheme.colorScheme.primary)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("انبار محصولات", style = MaterialTheme.typography.titleLarge)
+            }
+            Column(modifier = Modifier.padding(16.dp)) {
+                products.forEach { product ->
+                    val productPurchases = purchases.filter { it.items.any { item -> item.productId == product.id } }
+                    val productSales = sales.filter { it.products.any { item -> item.productId == product.id } }
+                    val totalPurchased = productPurchases.sumOf { it.items.find { item -> item.productId == product.id }?.quantity ?: 0 }
+                    val totalSold = productSales.sumOf { it.products.find { item -> item.productId == product.id }?.quantity ?: 0 }
+                    val stock = totalPurchased - totalSold
+                    val expanded = remember { mutableStateOf(false) }
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                        Text(product.name, modifier = Modifier.weight(1f))
+                        Text("موجودی: $stock", color = if (stock > 0) Color.Green else Color.Red)
+                        IconButton(onClick = { expanded.value = !expanded.value }) {
+                            Icon(Icons.Default.ArrowDropDown, contentDescription = "Show History")
+                        }
+                    }
+                    DropdownMenu(expanded = expanded.value, onDismissRequest = { expanded.value = false }) {
+                        productPurchases.forEach { purchase ->
+                            val qty = purchase.items.find { it.productId == product.id }?.quantity ?: 0
+                            DropdownMenuItem(text = { Text("+ $qty (خرید)", color = Color.Green) }, onClick = {})
+                        }
+                        productSales.forEach { sale ->
+                            val qty = sale.products.find { it.productId == product.id }?.quantity ?: 0
+                            DropdownMenuItem(text = { Text("- $qty (فروش)", color = Color.Red) }, onClick = {})
+                        }
+                    }
+                }
             }
         }
         Spacer(modifier = Modifier.height(24.dp))
