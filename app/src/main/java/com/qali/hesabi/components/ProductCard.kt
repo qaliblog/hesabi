@@ -56,8 +56,8 @@ import androidx.compose.foundation.border
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Print
+import androidx.compose.material.icons.filled.Share
 import android.print.PrintManager
 import android.print.PrintAttributes
 import android.print.pdf.PrintedPdfDocument
