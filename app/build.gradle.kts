@@ -60,6 +60,7 @@ dependencies {
 
     implementation(libs.bundles.compose.ui)
     implementation(libs.androidx.compose.material.icons)
+    implementation("androidx.compose.material:material-icons-extended:1.5.4")
 
     implementation(libs.androidx.navigation.compose)
 
