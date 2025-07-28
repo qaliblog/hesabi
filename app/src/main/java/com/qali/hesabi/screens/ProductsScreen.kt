@@ -115,7 +115,7 @@ fun ProductsScreen(
                     val productSales = sales.filter { it.products.any { item -> item.productId == product.id } }
                     val totalPurchased = productPurchases.sumOf { it.items.find { item -> item.productId == product.id }?.quantity ?: 0 }
                     val totalSold = productSales.sumOf { it.products.find { item -> item.productId == product.id }?.quantity ?: 0 }
-                    val stock = totalPurchased - totalSold
+                    val stock = product.quantity + totalPurchased - totalSold
                     val expanded = remember { mutableStateOf(false) }
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                         Text(product.name, modifier = Modifier.weight(1f))
