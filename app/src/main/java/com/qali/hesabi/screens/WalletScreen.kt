@@ -53,6 +53,14 @@ import com.patrykandpatrick.vico.compose.component.shape.Shapes
 import com.patrykandpatrick.vico.compose.component.textComponent
 import com.patrykandpatrick.vico.core.axis.Axis
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.viewinterop.AndroidView
+import com.github.mikephil.charting.charts.LineChart as MPLineChartView
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import android.graphics.Color as AndroidColor
 
 @Composable
 fun WalletScreen(navController: NavController, walletTransactionViewModel: WalletTransactionViewModel) {
@@ -150,12 +158,48 @@ fun WalletScreen(navController: NavController, walletTransactionViewModel: Walle
 }
 
 @Composable
+fun MPLineChart(
+    data: List<Pair<String, Float>>,
+    modifier: Modifier = Modifier
+) {
+    AndroidView(
+        modifier = modifier,
+        factory = { context ->
+            MPLineChartView(context).apply {
+                this.setDrawGridBackground(false)
+                this.axisRight.isEnabled = false
+                this.description.isEnabled = false
+                this.legend.isEnabled = false
+                this.xAxis.position = XAxis.XAxisPosition.BOTTOM
+                this.xAxis.setDrawGridLines(true)
+                this.axisLeft.setDrawGridLines(true)
+                this.xAxis.labelRotationAngle = 90f
+                this.xAxis.granularity = 1f
+            }
+        },
+        update = { chart ->
+            val entries = data.mapIndexed { idx, pair -> Entry(idx.toFloat(), pair.second) }
+            val dataSet = LineDataSet(entries, "Net").apply {
+                color = AndroidColor.BLUE
+                setCircleColor(AndroidColor.RED)
+                lineWidth = 2f
+                circleRadius = 4f
+                setDrawValues(false)
+            }
+            chart.data = LineData(dataSet)
+            chart.xAxis.valueFormatter = IndexAxisValueFormatter(data.map { it.first })
+            chart.invalidate()
+        }
+    )
+}
+
+@Composable
 fun DailyExpensesChart(transactions: List<com.qali.hesabi.data.WalletTransaction>) {
     var chartMode by remember { mutableStateOf("روزانه") }
     val modes = listOf("روزانه", "ماهانه")
     Column(Modifier.fillMaxWidth()) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text("سود/زیان ${chartMode}", style = androidx.compose.material3.MaterialTheme.typography.titleMedium, modifier = Modifier.padding(bottom = 8.dp))
+            Text("سود/زیان ${chartMode}", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(bottom = 8.dp))
             Spacer(Modifier.weight(1f))
             Row {
                 modes.forEach { mode ->
@@ -175,55 +219,29 @@ fun DailyExpensesChart(transactions: List<com.qali.hesabi.data.WalletTransaction
             }
         }
         Spacer(Modifier.height(8.dp))
-        if (chartMode == "روزانه") {
-            LineChartVico(transactions, groupByMonth = false)
-        } else {
-            LineChartVico(transactions, groupByMonth = true)
+        val grouped = transactions.groupBy {
+            val date = java.util.Date(it.date)
+            if (chartMode == "ماهانه") {
+                val jalali = com.qali.hesabi.util.JalaliUtils.toJalaliString(date)
+                jalali.substring(0, 7) // yyyy/MM
+            } else {
+                com.qali.hesabi.util.JalaliUtils.toJalaliString(date)
+            }
         }
-    }
-}
-
-@Composable
-fun LineChartVico(transactions: List<com.qali.hesabi.data.WalletTransaction>, groupByMonth: Boolean) {
-    // Group by Jalali date (day or month)
-    val grouped = transactions.groupBy {
-        val date = java.util.Date(it.date)
-        if (groupByMonth) {
-            val jalali = com.qali.hesabi.util.JalaliUtils.toJalaliString(date)
-            jalali.substring(0, 7) // yyyy/MM
+        val netByGroup = grouped.map { (date, txs) ->
+            val income = txs.filter { it.type == com.qali.hesabi.data.TransactionType.INCOME }.sumOf { it.amount }
+            val expense = txs.filter { it.type == com.qali.hesabi.data.TransactionType.EXPENSE }.sumOf { it.amount }
+            val net = income - expense
+            date to net.toFloat()
+        }.sortedBy { it.first }
+        if (netByGroup.isEmpty()) {
+            Text("هیچ داده‌ای برای نمایش وجود ندارد", style = MaterialTheme.typography.bodyMedium)
         } else {
-            com.qali.hesabi.util.JalaliUtils.toJalaliString(date)
-        }
-    }
-    val netByGroup = grouped.map { (date, txs) ->
-        val income = txs.filter { it.type == com.qali.hesabi.data.TransactionType.INCOME }.sumOf { it.amount }
-        val expense = txs.filter { it.type == com.qali.hesabi.data.TransactionType.EXPENSE }.sumOf { it.amount }
-        val net = income - expense
-        date to net
-    }.sortedBy { it.first }
-    if (netByGroup.isEmpty()) {
-        Text("هیچ داده‌ای برای نمایش وجود ندارد", style = androidx.compose.material3.MaterialTheme.typography.bodyMedium)
-        return
-    }
-    // Prepare chart entries and labels
-    val entries = netByGroup.mapIndexed { idx, pair -> FloatEntry(idx.toFloat(), pair.second.toFloat()) }
-    val labels = netByGroup.map { it.first }
-    val entryModel = entryModelOf(entries)
-    val horizontalAxis = rememberAxis(
-        valueFormatter = { value, _ ->
-            val i = value.toInt()
-            if (i in labels.indices) labels[i] else ""
-        },
-        labelRotationDegrees = 90f
-    )
-    val verticalAxis = rememberAxis()
-    Column(Modifier.fillMaxWidth()) {
-        Box(Modifier.height(220.dp).fillMaxWidth()) {
-            LineChart(
-                entryModel = entryModel,
-                startAxis = verticalAxis,
-                bottomAxis = horizontalAxis,
-                modifier = Modifier.fillMaxSize()
+            MPLineChart(
+                data = netByGroup,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(260.dp)
             )
         }
     }
