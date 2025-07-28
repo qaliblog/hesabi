@@ -13,7 +13,11 @@ class ProductViewModel(private val productDao: ProductDao) : ViewModel() {
     val allProducts: Flow<List<Product>> = productDao.getAllProducts()
 
     fun insert(product: Product) = viewModelScope.launch {
-        productDao.insert(product)
+        try {
+            productDao.insert(product)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     fun update(product: Product) = viewModelScope.launch {
