@@ -174,7 +174,7 @@ fun DailyExpensesChart(transactions: List<com.qali.hesabi.data.WalletTransaction
                     size = androidx.compose.ui.geometry.Size(barWidth, barHeight)
                 )
                 // Draw amount above bar and date below bar using drawIntoCanvas
-                drawIntoCanvas { canvas ->
+                drawIntoCanvas { canvas: androidx.compose.ui.graphics.Canvas ->
                     val paint = android.graphics.Paint().apply {
                         textAlign = android.graphics.Paint.Align.CENTER
                         textSize = 28f
