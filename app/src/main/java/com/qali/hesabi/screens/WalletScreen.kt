@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.Box
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 
 @Composable
 fun WalletScreen(navController: NavController, walletTransactionViewModel: WalletTransactionViewModel) {
