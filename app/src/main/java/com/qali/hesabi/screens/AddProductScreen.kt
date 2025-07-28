@@ -41,6 +41,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import android.util.Log
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.listSaver
 
 // State holder for form data
 data class ProductFormState(
@@ -50,11 +51,36 @@ data class ProductFormState(
     val barcode: String = "",
     val isEdit: Boolean = false,
     val initialized: Boolean = false
-)
+) {
+    companion object {
+        val Saver = listSaver<ProductFormState, Any>(
+            save = { state ->
+                listOf(
+                    state.name,
+                    state.price.toString(),
+                    state.quantity.toString(),
+                    state.barcode,
+                    state.isEdit.toString(),
+                    state.initialized.toString()
+                )
+            },
+            restore = { list ->
+                ProductFormState(
+                    name = list[0] as String,
+                    price = (list[1] as String).toDoubleOrNull() ?: 0.0,
+                    quantity = (list[2] as String).toIntOrNull() ?: 0,
+                    barcode = list[3] as String,
+                    isEdit = (list[4] as String).toBoolean(),
+                    initialized = (list[5] as String).toBoolean()
+                )
+            }
+        )
+    }
+}
 
 @Composable
 fun AddProductScreen(navController: NavController, productViewModel: ProductViewModel, productId: Int? = null) {
-    var formState by rememberSaveable { mutableStateOf(ProductFormState()) }
+    var formState by rememberSaveable(stateSaver = ProductFormState.Saver) { mutableStateOf(ProductFormState()) }
 
     // Add debugging for form state
     LaunchedEffect(formState) {
