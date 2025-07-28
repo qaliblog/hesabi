@@ -56,6 +56,17 @@ import androidx.compose.foundation.border
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Print
+import android.print.PrintManager
+import android.print.PrintAttributes
+import android.print.pdf.PrintedPdfDocument
+import android.print.PrintDocumentAdapter
+import android.print.PrintDocumentInfo
+import android.graphics.pdf.PdfDocument
+import android.os.CancellationSignal
+import android.os.ParcelFileDescriptor
+import java.io.FileOutputStream
 
 @Composable
 fun ProductCard(
@@ -129,42 +140,60 @@ fun ProductCard(
                                 tint = MaterialTheme.colorScheme.error
                             )
                         }
-                    }
-                    IconButton(
-                        onClick = {
-                            coroutineScope.launch {
-                                downloadStatus = DownloadStatus.Downloading
-                                try {
-                                    requestPermission()
-                                    val barcodeEncoder = BarcodeEncoder()
-                                    val bitmap = barcodeEncoder.encodeBitmap(product.barcode, BarcodeFormat.CODE_128, 400, 150)
-                                    val success = saveBitmap(context, bitmap, "${product.name}-barcode.png")
-                                    if (success) {
-                                        downloadStatus = DownloadStatus.Success
-                                        Toast.makeText(context, "بارکد با موفقیت دانلود شد", Toast.LENGTH_SHORT).show()
-                                    } else {
+                        IconButton(
+                            onClick = {
+                                coroutineScope.launch {
+                                    downloadStatus = DownloadStatus.Downloading
+                                    try {
+                                        requestPermission()
+                                        val barcodeEncoder = BarcodeEncoder()
+                                        val bitmap = barcodeEncoder.encodeBitmap(product.barcode, BarcodeFormat.CODE_128, 400, 150)
+                                        val success = saveBitmap(context, bitmap, "${product.name}-barcode.png")
+                                        if (success) {
+                                            downloadStatus = DownloadStatus.Success
+                                            Toast.makeText(context, "بارکد با موفقیت دانلود شد", Toast.LENGTH_SHORT).show()
+                                        } else {
+                                            downloadStatus = DownloadStatus.Error
+                                            Toast.makeText(context, "خطا در دانلود بارکد", Toast.LENGTH_SHORT).show()
+                                        }
+                                    } catch (e: Exception) {
+                                        Log.e("ProductCard", "Error downloading barcode", e)
                                         downloadStatus = DownloadStatus.Error
-                                        Toast.makeText(context, "خطا در دانلود بارکد", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, "خطا در دانلود بارکد: ${e.message}", Toast.LENGTH_SHORT).show()
                                     }
-                                } catch (e: Exception) {
-                                    Log.e("ProductCard", "Error downloading barcode", e)
-                                    downloadStatus = DownloadStatus.Error
-                                    Toast.makeText(context, "خطا در دانلود بارکد: ${e.message}", Toast.LENGTH_SHORT).show()
                                 }
+                            },
+                            modifier = Modifier
+                                .background(
+                                    color = MaterialTheme.colorScheme.primary,
+                                    shape = MaterialTheme.shapes.small
+                                )
+                                .padding(4.dp)
+                        ) {
+                            when (downloadStatus) {
+                                DownloadStatus.Idle -> Icon(Icons.Filled.ArrowDownward, contentDescription = "دانلود بارکد", tint = MaterialTheme.colorScheme.onPrimary)
+                                DownloadStatus.Downloading -> Icon(Icons.Filled.ArrowDownward, contentDescription = "در حال دانلود", tint = MaterialTheme.colorScheme.onPrimary)
+                                DownloadStatus.Success -> Icon(Icons.Filled.Check, contentDescription = "دانلود شد", tint = MaterialTheme.colorScheme.tertiary)
+                                DownloadStatus.Error -> Icon(Icons.Filled.Error, contentDescription = "خطا", tint = MaterialTheme.colorScheme.error)
                             }
-                        },
-                        modifier = Modifier
-                            .background(
-                                color = MaterialTheme.colorScheme.primary,
-                                shape = MaterialTheme.shapes.small
-                            )
-                            .padding(4.dp)
-                    ) {
-                        when (downloadStatus) {
-                            DownloadStatus.Idle -> Icon(Icons.Filled.ArrowDownward, contentDescription = "دانلود بارکد", tint = MaterialTheme.colorScheme.onPrimary)
-                            DownloadStatus.Downloading -> Icon(Icons.Filled.ArrowDownward, contentDescription = "در حال دانلود", tint = MaterialTheme.colorScheme.onPrimary)
-                            DownloadStatus.Success -> Icon(Icons.Filled.Check, contentDescription = "دانلود شد", tint = MaterialTheme.colorScheme.tertiary)
-                            DownloadStatus.Error -> Icon(Icons.Filled.Error, contentDescription = "خطا", tint = MaterialTheme.colorScheme.error)
+                        }
+                        IconButton(onClick = {
+                            coroutineScope.launch {
+                                val barcodeEncoder = BarcodeEncoder()
+                                val bitmap = barcodeEncoder.encodeBitmap(product.barcode, BarcodeFormat.CODE_128, 400, 150)
+                                shareBitmap(context, bitmap, "${product.name}-barcode.png")
+                            }
+                        }) {
+                            Icon(Icons.Filled.Share, contentDescription = "اشتراک گذاری بارکد", tint = MaterialTheme.colorScheme.secondary)
+                        }
+                        IconButton(onClick = {
+                            coroutineScope.launch {
+                                val barcodeEncoder = BarcodeEncoder()
+                                val bitmap = barcodeEncoder.encodeBitmap(product.barcode, BarcodeFormat.CODE_128, 400, 150)
+                                printBitmap(context, bitmap, "بارکد محصول")
+                            }
+                        }) {
+                            Icon(Icons.Filled.Print, contentDescription = "چاپ بارکد", tint = MaterialTheme.colorScheme.tertiary)
                         }
                     }
                 }
@@ -232,4 +261,62 @@ private fun saveBitmap(context: android.content.Context, bitmap: Bitmap, fileNam
         Log.e("ProductCard", "Error saving bitmap", e)
         false
     }
+}
+
+// Utility functions for sharing and printing
+private fun shareBitmap(context: android.content.Context, bitmap: Bitmap, fileName: String) {
+    val cachePath = java.io.File(context.cacheDir, "images")
+    cachePath.mkdirs()
+    val file = java.io.File(cachePath, fileName)
+    val fileOutputStream = java.io.FileOutputStream(file)
+    bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
+    fileOutputStream.close()
+    val uri = androidx.core.content.FileProvider.getUriForFile(context, context.packageName + ".provider", file)
+    val shareIntent = android.content.Intent().apply {
+        action = android.content.Intent.ACTION_SEND
+        putExtra(android.content.Intent.EXTRA_STREAM, uri)
+        type = "image/png"
+        addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
+    context.startActivity(android.content.Intent.createChooser(shareIntent, "اشتراک گذاری بارکد"))
+}
+private fun printBitmap(context: android.content.Context, bitmap: Bitmap, jobName: String) {
+    val printManager = context.getSystemService(android.content.Context.PRINT_SERVICE) as PrintManager
+    val printAdapter = object : PrintDocumentAdapter() {
+        override fun onLayout(
+            oldAttributes: PrintAttributes?,
+            newAttributes: PrintAttributes?,
+            cancellationSignal: CancellationSignal?,
+            callback: LayoutResultCallback?,
+            extras: android.os.Bundle?
+        ) {
+            if (cancellationSignal?.isCanceled == true) {
+                callback?.onLayoutCancelled()
+                return
+            }
+            val info = PrintDocumentInfo.Builder("barcode.pdf").setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT).build()
+            callback?.onLayoutFinished(info, true)
+        }
+        override fun onWrite(
+            pages: Array<out android.print.PageRange>?,
+            destination: ParcelFileDescriptor?,
+            cancellationSignal: CancellationSignal?,
+            callback: WriteResultCallback?
+        ) {
+            val pdfDocument = PrintedPdfDocument(context, PrintAttributes.Builder().build())
+            val page = pdfDocument.startPage(0)
+            val canvas = page.canvas
+            canvas.drawBitmap(bitmap, 0f, 0f, null)
+            pdfDocument.finishPage(page)
+            try {
+                pdfDocument.writeTo(FileOutputStream(destination?.fileDescriptor))
+                callback?.onWriteFinished(arrayOf(android.print.PageRange.ALL_PAGES))
+            } catch (e: Exception) {
+                callback?.onWriteFailed(e.toString())
+            } finally {
+                pdfDocument.close()
+            }
+        }
+    }
+    printManager.print(jobName, printAdapter, null)
 }

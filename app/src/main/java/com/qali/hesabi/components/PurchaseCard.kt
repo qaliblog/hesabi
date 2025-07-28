@@ -47,6 +47,17 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Print
+import android.print.PrintManager
+import android.print.PrintAttributes
+import android.print.pdf.PrintedPdfDocument
+import android.print.PrintDocumentAdapter
+import android.print.PrintDocumentInfo
+import android.graphics.pdf.PdfDocument
+import android.os.CancellationSignal
+import android.os.ParcelFileDescriptor
+import java.io.FileOutputStream
 
 @Composable
 fun PurchaseCard(
@@ -160,6 +171,28 @@ fun PurchaseCard(
                             tint = Color(0xFF1976D2)
                         )
                     }
+                    IconButton(onClick = {
+                        coroutineScope.launch {
+                            val filePath = ReceiptUtils.saveReceiptAsPng(context, purchase)
+                            if (filePath != null) {
+                                val bitmap = android.graphics.BitmapFactory.decodeFile(filePath)
+                                shareBitmap(context, bitmap, "purchase-receipt.png")
+                            }
+                        }
+                    }) {
+                        Icon(Icons.Filled.Share, contentDescription = "اشتراک گذاری رسید", tint = Color(0xFF388E3C))
+                    }
+                    IconButton(onClick = {
+                        coroutineScope.launch {
+                            val filePath = ReceiptUtils.saveReceiptAsPng(context, purchase)
+                            if (filePath != null) {
+                                val bitmap = android.graphics.BitmapFactory.decodeFile(filePath)
+                                printBitmap(context, bitmap, "رسید خرید")
+                            }
+                        }
+                    }) {
+                        Icon(Icons.Filled.Print, contentDescription = "چاپ رسید", tint = Color(0xFF6D4C41))
+                    }
                 }
             }
         }
@@ -184,4 +217,62 @@ fun PurchaseCard(
             }
         )
     }
+}
+
+// Utility functions for sharing and printing
+private fun shareBitmap(context: android.content.Context, bitmap: android.graphics.Bitmap, fileName: String) {
+    val cachePath = java.io.File(context.cacheDir, "images")
+    cachePath.mkdirs()
+    val file = java.io.File(cachePath, fileName)
+    val fileOutputStream = java.io.FileOutputStream(file)
+    bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, fileOutputStream)
+    fileOutputStream.close()
+    val uri = androidx.core.content.FileProvider.getUriForFile(context, context.packageName + ".provider", file)
+    val shareIntent = android.content.Intent().apply {
+        action = android.content.Intent.ACTION_SEND
+        putExtra(android.content.Intent.EXTRA_STREAM, uri)
+        type = "image/png"
+        addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
+    context.startActivity(android.content.Intent.createChooser(shareIntent, "اشتراک گذاری رسید"))
+}
+private fun printBitmap(context: android.content.Context, bitmap: android.graphics.Bitmap, jobName: String) {
+    val printManager = context.getSystemService(android.content.Context.PRINT_SERVICE) as PrintManager
+    val printAdapter = object : PrintDocumentAdapter() {
+        override fun onLayout(
+            oldAttributes: PrintAttributes?,
+            newAttributes: PrintAttributes?,
+            cancellationSignal: CancellationSignal?,
+            callback: LayoutResultCallback?,
+            extras: android.os.Bundle?
+        ) {
+            if (cancellationSignal?.isCanceled == true) {
+                callback?.onLayoutCancelled()
+                return
+            }
+            val info = PrintDocumentInfo.Builder("receipt.pdf").setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT).build()
+            callback?.onLayoutFinished(info, true)
+        }
+        override fun onWrite(
+            pages: Array<out android.print.PageRange>?,
+            destination: ParcelFileDescriptor?,
+            cancellationSignal: CancellationSignal?,
+            callback: WriteResultCallback?
+        ) {
+            val pdfDocument = PrintedPdfDocument(context, PrintAttributes.Builder().build())
+            val page = pdfDocument.startPage(0)
+            val canvas = page.canvas
+            canvas.drawBitmap(bitmap, 0f, 0f, null)
+            pdfDocument.finishPage(page)
+            try {
+                pdfDocument.writeTo(FileOutputStream(destination?.fileDescriptor))
+                callback?.onWriteFinished(arrayOf(android.print.PageRange.ALL_PAGES))
+            } catch (e: Exception) {
+                callback?.onWriteFailed(e.toString())
+            } finally {
+                pdfDocument.close()
+            }
+        }
+    }
+    printManager.print(jobName, printAdapter, null)
 }
