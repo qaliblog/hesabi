@@ -133,6 +133,7 @@ fun ProductCard(
                                 tint = MaterialTheme.colorScheme.primary
                             )
                         }
+                        Spacer(modifier = Modifier.width(8.dp))
                         IconButton(onClick = { showDialog.value = true }) {
                             Icon(
                                 imageVector = androidx.compose.material.icons.Icons.Default.Delete,
@@ -140,6 +141,7 @@ fun ProductCard(
                                 tint = MaterialTheme.colorScheme.error
                             )
                         }
+                        Spacer(modifier = Modifier.width(8.dp))
                         IconButton(
                             onClick = {
                                 coroutineScope.launch {
@@ -163,12 +165,7 @@ fun ProductCard(
                                     }
                                 }
                             },
-                            modifier = Modifier
-                                .background(
-                                    color = MaterialTheme.colorScheme.primary,
-                                    shape = MaterialTheme.shapes.small
-                                )
-                                .padding(4.dp)
+                            // Remove extra background and padding for consistency
                         ) {
                             when (downloadStatus) {
                                 DownloadStatus.Idle -> Icon(Icons.Filled.ArrowDownward, contentDescription = "دانلود بارکد", tint = MaterialTheme.colorScheme.onPrimary)
@@ -177,6 +174,7 @@ fun ProductCard(
                                 DownloadStatus.Error -> Icon(Icons.Filled.Error, contentDescription = "خطا", tint = MaterialTheme.colorScheme.error)
                             }
                         }
+                        Spacer(modifier = Modifier.width(8.dp))
                         IconButton(onClick = {
                             coroutineScope.launch {
                                 val barcodeEncoder = BarcodeEncoder()
@@ -186,6 +184,7 @@ fun ProductCard(
                         }) {
                             Icon(Icons.Filled.Share, contentDescription = "اشتراک گذاری بارکد", tint = MaterialTheme.colorScheme.secondary)
                         }
+                        Spacer(modifier = Modifier.width(8.dp))
                         IconButton(onClick = {
                             coroutineScope.launch {
                                 val barcodeEncoder = BarcodeEncoder()
