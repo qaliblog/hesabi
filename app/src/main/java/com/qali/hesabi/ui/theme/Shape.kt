@@ -13,11 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package vtsen.hashnode.dev.newemptycomposeapp.ui.theme
+package com.qali.hesabi.ui.theme
 
 import androidx.compose.material3.Shapes
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.unit.dp
 
 val Shapes =
     Shapes(
-        // Override CornerBasedShape Here
+        small = RoundedCornerShape(12.dp),
+        medium = RoundedCornerShape(20.dp),
+        large = RoundedCornerShape(28.dp)
     )
