@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package vtsen.hashnode.dev.newemptycomposeapp.ui.theme
+package com.qali.hesabi.ui.theme
 
-import androidx.compose.material3.Typography
+import androidx.compose.material3.Shapes
 
-val Typography =
-    Typography(
-        // Override TextStyle Here
+val Shapes =
+    Shapes(
+        // Override CornerBasedShape Here
     )
