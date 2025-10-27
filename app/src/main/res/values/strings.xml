@@ -1,4 +1,20 @@
 <resources>
-    <string name="app_name">New Empty Compose App</string>
-    <string name="hello_android">Hello Android!</string>
+    <string name="app_name">حسابی</string>
+    <string name="products">محصولات</string>
+    <string name="add_product">افزودن محصول جدید</string>
+    <string name="price">قیمت</string>
+    <string name="quantity">تعداد</string>
+    <string name="barcode">بارکد</string>
+    <string name="download_barcode">دانلود بارکد</string>
+    <string name="sales">فروش‌ها</string>
+    <string name="add_sale">افزودن فروش جدید</string>
+    <string name="buyer_name">نام خریدار</string>
+    <string name="purchases">خریدها</string>
+    <string name="add_purchase">افزودن خرید جدید</string>
+    <string name="wallet">کیف پول</string>
+    <string name="add_wallet_transaction">افزودن تراکنش جدید</string>
+    <string name="income">درآمد</string>
+    <string name="expense">هزینه</string>
+    <string name="receipt">رسید</string>
+    <string name="download_receipt">دانلود رسید</string>
 </resources>
