@@ -2,14 +2,15 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("kotlin-kapt")
 }
 
 android {
-    namespace = "vtsen.hashnode.dev.newemptycomposeapp"
+    namespace = "com.qali.hesabi"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "vtsen.hashnode.dev.newemptycomposeapp"
+        applicationId = "com.qali.hesabi"
         minSdk = 21
         targetSdk = 34
         versionCode = 1
@@ -58,10 +59,30 @@ dependencies {
     implementation(libs.androidx.activity.compose)
 
     implementation(libs.bundles.compose.ui)
+    implementation(libs.androidx.compose.material.icons)
+
+    implementation(libs.androidx.navigation.compose)
 
     implementation(libs.accompanist.systemuicontroller)
 
     implementation(libs.androidx.splash.screen)
 
     implementation(libs.vinchamp77.buildutils)
+    // ZXing for barcode generation and scanning
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+    // ML Kit Barcode Scanning
+    implementation("com.google.mlkit:barcode-scanning:17.2.0")
+
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    kapt(libs.androidx.room.compiler)
+    
+    // Gson for JSON serialization
+    implementation("com.google.code.gson:gson:2.10.1")
+    // implementation("com.github.samanzamani.persiandate:PersianDate:0.8.4") // Remove unavailable library
+    implementation("com.github.eloyzone:jalali-calendar:1.0.0")
+    implementation("com.patrykandpatrick.vico:compose:1.13.0")
+    implementation("com.patrykandpatrick.vico:core:1.13.0")
+    implementation("com.patrykandpatrick.vico:compose-m3:1.13.0")
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 }
