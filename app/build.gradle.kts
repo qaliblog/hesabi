@@ -64,4 +64,8 @@ dependencies {
     implementation(libs.androidx.splash.screen)
 
     implementation(libs.vinchamp77.buildutils)
+    // ZXing for barcode generation and scanning
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+    // ML Kit Barcode Scanning
+    implementation("com.google.mlkit:barcode-scanning:17.2.0")
 }
